@@ -22,14 +22,24 @@ void TCPServer::handle_accept(TCPConnection::pointer new_connection,
 {
 	if (!e)
 	{
-		// add to list
-		connections[(new_connection);
-		new_connection->start();
+		//std::string addr = new_connection->socket().remote_endpoint().address().to_string();
+		//if (ip_ban_list.find(addr) == ip_ban_list.end()) {
+			// add to list
+			unverified.push_back(new_connection);
+			new_connection->start();
+		//}
+
 	}
 
 	this->start_accept(); // loops back to give work
 }
 
-bool TCPServer::send_packet(TCPConnection::pointer client, Packet::Type type, void* data) {
+bool TCPServer::send_packet(TCPConnection::pointer connection, Packet::Type type, void* data) {
+	
+}
+
+bool TCPServer::verify(TCPConnection::pointer connection) {
+
+
 
 }

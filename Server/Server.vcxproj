@@ -145,6 +145,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="network\OwnedPacket.cpp" />
     <ClCompile Include="network\tcp_connection.cpp" />
     <ClCompile Include="network\tcp_server.cpp" />
   </ItemGroup>
