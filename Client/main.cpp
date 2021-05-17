@@ -2,17 +2,30 @@
 	Simple udp client
 */
 #include <stdio.h>
-#include <winsock2.h>
+//#include <winsock2.h>
 #include <iostream>
-#include <Ws2tcpip.h>
+//#include <Ws2tcpip.h>
 #include <tchar.h>
 #include <sstream>
 #include <fstream>
 #include <string>
 #include <queue>
-#include "network/TCPClient.h"
+#include "chat/InputTextHandler.h"
+//#include <SDL_image.h>
+#include "GlobalContainer.h"
+#include "engine/Engine.h"
+#include "engine/SpriteEngine.h"
+#include "sprite/Player.h"
 
-#pragma comment(lib,"ws2_32.lib") //Winsock Library
+//#ifdef _WIN32
+//#define _WIN32_WINNT 0xA00
+//#endif
+//#define ASIO_STANDALONE
+//#include <asio.hpp>
+//#include <asio/ts/buffer.hpp>
+//#include <asio/ts/internet.hpp>
+
+//#pragma comment(lib,"ws2_32.lib") //Winsock Library
 
 #define SERVER "127.0.0.1"	//ip address of udp server
 #define BUFLEN 512	//Max length of buffer
@@ -20,66 +33,122 @@
 
 int main(void)
 {
-	WSADATA wsa;
+	Engine::init();
+	SpriteEngine::init();
 
-	//Initialise winsock
-	printf("\nInitialising Winsock...");
-	if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
-	{
-		printf("Failed. Error Code : %d", WSAGetLastError());
-		exit(EXIT_FAILURE);
+
+
+
+	//std::thread tcp_task = std::thread(&TCPClient::beginListening, &tcp_client);
+
+	GlobalContainer::tcp_client.beginListeningAsync("192.168.1.200", 8888);
+
+
+
+
+
+
+
+	//std::string line;
+	//
+	//const char* filename = "chat_to_send.txt";
+	//std::ifstream infile(filename);
+	//
+	//if (!infile.is_open())
+	//	printf("couldn't find %s\n", filename);
+	//
+	//std::queue<std::string> chat_strings_to_send;
+	//
+	//while (std::getline(infile, line)) {
+	//	chat_strings_to_send.push(line);
+	//}
+	//
+	//while (!chat_strings_to_send.empty()) {
+	//	PacketChat packet(chat_strings_to_send.front());
+	//	chat_strings_to_send.pop();
+	//	tcp_client.sendPacket(&packet);
+	//
+	//}
+
+	//Engine::drawString("Hello world", 400, 300, 8, true);
+
+	//SDL_StartTextInput();
+
+	Player player;
+
+	bool alive = true;
+	bool render = true;
+	while (alive) {
+
+		SDL_Event e;
+		while (SDL_PollEvent(&e))
+		{
+			bool chatting = GlobalContainer::input_text_handler.processInput(e);
+
+			switch (e.type)
+			{
+			case SDL_QUIT:
+				alive = false;
+				break;
+			case SDL_WINDOWEVENT:
+				switch (e.window.event) {
+				case SDL_WINDOWEVENT_SHOWN:
+				case SDL_WINDOWEVENT_EXPOSED:
+				case SDL_WINDOWEVENT_MAXIMIZED:
+				//case SDL_WINDOWEVENT_ENTER:
+				case SDL_WINDOWEVENT_FOCUS_GAINED:
+				//case SDL_WINDOWEVENT_TAKE_FOCUS:
+					render = true;
+					break;
+				case SDL_WINDOWEVENT_HIDDEN:
+				case SDL_WINDOWEVENT_MINIMIZED:
+				//case SDL_WINDOWEVENT_LEAVE:
+				case SDL_WINDOWEVENT_FOCUS_LOST:
+					render = false;
+					break;
+				}
+			case SDL_KEYDOWN:
+				if (!chatting) {
+					// game events
+					break;
+				}
+			}
+			
+		}
+
+		// must put all rendering in here or gpu will fall behind on rendering
+		// when frames are dispatched due to all the queued frames
+		if (render) {
+			Engine::fill({0, 0, 0, 255});
+
+			GlobalContainer::input_text_handler.render();
+
+			player.render();
+
+			Engine::doRender();
+		}
+		//Sleep(1000);
+
+		//Engine::
 	}
-	printf("Initialised.\n");
 
-	TCPClient tcp_client;
-	tcp_client.beginListeningAsync("192.168.1.200", 8888);
+	//SDL_StopTextInput();
 
+	//GlobalContainer::tcp_client.close();
 
+	SpriteEngine::uninit();
+	Engine::uninit();
 
-
-
-
-
-	std::string line;
-
-	const char* filename = "chat_to_send.txt";
-	std::ifstream infile(filename);
-
-	if (!infile.is_open())
-		printf("couldn't find %s\n", filename);
-
-	std::queue<std::string> chat_strings_to_send;
-
-	while (std::getline(infile, line)) {
-		chat_strings_to_send.push(line);
-	}
-
-	while (true) {
-
-		if (chat_strings_to_send.empty())
-			break;
-
-		printf("delaying ... (3s)\n");
-
-		Sleep(3000);
-
-		PacketChat packet(chat_strings_to_send.front());
-		chat_strings_to_send.pop();
-		tcp_client.sendPacket(&packet);
-
-	}
-
-	while (true) {
-		Sleep(1000);
-	}
 
 
 	return 0;
 
 
+	/*
+		udp stuff
+		*/
 
-
-
+	/*
 	struct sockaddr_in si_other;
 	int s, slen = sizeof(si_other);
 	char buf[BUFLEN];
@@ -158,4 +227,5 @@ int main(void)
 	WSACleanup();
 
 	return 0;
+	*/
 }

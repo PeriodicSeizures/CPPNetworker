@@ -1,6 +1,4 @@
 #include "ByteReader.h"
-#include <limits.h>
-#include <vcruntime_string.h>
 
 ByteReader::ByteReader(char* buf) : buf(buf), pos(0) {}
 
@@ -75,5 +73,8 @@ void ByteReader::readAsciiString(char* ret) {
 void ByteReader::readString(std::string& ret) {
 	//ret.resize(64);
 	//strcpy(&ret., )
-	ret = std::string(buf + pos);
+	if (buf[pos] != '\0') {
+		ret = std::string(buf + pos);
+	}
+	pos += ret.length() + 1;
 }

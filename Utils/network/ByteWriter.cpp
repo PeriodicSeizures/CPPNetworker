@@ -9,9 +9,6 @@ unsigned int ByteWriter::getOffset() {
 }
 
 void ByteWriter::write(char c) { 
-
-	printf("buf[%u] = %d\n", pos, (int)c);
-
 	buf[pos++] = c;
 }
 void ByteWriter::writeUnsignedByte(uint8_t c) { 
@@ -54,14 +51,16 @@ void ByteWriter::writeDouble(double c) {
 	pos += sizeof(double);
 }
 void ByteWriter::writeAsciiString(char* ascii, unsigned int len) {
-	// write ascii into buf
-	//std::copy(first, last, dst);
-	//strcpy(buf, ascii); // should be null terminating
-
 	memcpy(buf + pos, ascii, static_cast<size_t>(len) + 1);
 	pos += len + 1;
 }
 void ByteWriter::writeString(const std::string& message) {
-	memcpy(buf + pos, message.c_str(), message.length());
-	pos += message.length() + 1;
+
+	if (message.empty()) {
+		write('\0');
+	}
+	else {
+		memcpy(buf + pos, message.c_str(), message.length() + 1);
+		pos += message.length() + 1;
+	}
 }

@@ -27,6 +27,11 @@ public:
 	double readDouble();
 	void readAsciiString(char *ret);
 	void readString(std::string &ret);
+
+	template<typename T>
+	T readEnumUnsignedShort() {
+		return static_cast<T>(readUnsignedShort());
+	};
 };
 
 #endif

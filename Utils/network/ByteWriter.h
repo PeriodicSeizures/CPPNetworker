@@ -29,6 +29,11 @@ public:
 	void writeDouble(double c);
 	void writeAsciiString(char* ascii, unsigned int len);
 	void writeString(const std::string& message);
+
+	template<typename T>
+	void writeEnumUnsignedShort(T _enum) {
+		writeUnsignedShort(static_cast<unsigned short>(_enum));
+	};
 };
 
 #endif

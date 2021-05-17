@@ -15,27 +15,21 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="network\ConnectedClient.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="network\TCPServer.cpp">
+    <ClCompile Include="network\tcp_connection.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="network\UDPServer.cpp">
+    <ClCompile Include="network\tcp_server.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="network\ConnectedClient.h">
+    <ClInclude Include="network\tcp_connection.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="network\TCPServer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="network\UDPServer.h">
+    <ClInclude Include="network\tcp_server.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

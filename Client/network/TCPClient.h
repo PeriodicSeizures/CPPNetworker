@@ -16,8 +16,10 @@ private:
 
 public:
 	TCPClient();
+	~TCPClient();
 
 public:
+	
 
 	void beginListeningAsync(const char* ip, uint16_t port);
 
@@ -26,7 +28,9 @@ public:
 private:
 	void doListen();
 
-	Packet* processPacket(ByteReader& reader);
+	Packet* deserialize(ByteReader& reader);
+
+	void close();
 };
 
 #endif
