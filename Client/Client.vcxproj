@@ -158,7 +158,6 @@
     <ClCompile Include="GlobalContainer.cpp" />
     <ClCompile Include="network\TCPClient.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="network\UDPClient.cpp" />
     <ClCompile Include="sprite\Player.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -167,7 +166,6 @@
     <ClInclude Include="engine\SpriteEngine.h" />
     <ClInclude Include="GlobalContainer.h" />
     <ClInclude Include="network\TCPClient.h" />
-    <ClInclude Include="network\UDPClient.h" />
     <ClInclude Include="sprite\Player.h" />
   </ItemGroup>
   <ItemGroup>

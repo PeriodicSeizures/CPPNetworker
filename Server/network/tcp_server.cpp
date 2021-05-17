@@ -13,7 +13,9 @@ void TCPServer::start_accept()
 		TCPConnection::create(io_context_);
 
 	acceptor_.async_accept(new_connection->socket(),
-		std::bind(&TCPServer::handle_accept, this, new_connection,
+		std::bind(&TCPServer::handle_accept, 
+			this, 
+			new_connection,
 			std::placeholders::_1));
 }
 
@@ -22,10 +24,12 @@ void TCPServer::handle_accept(TCPConnection::pointer new_connection,
 {
 	if (!e)
 	{
-		//std::string addr = new_connection->socket().remote_endpoint().address().to_string();
+		std::string addr = new_connection->socket().remote_endpoint().address().to_string();
 		//if (ip_ban_list.find(addr) == ip_ban_list.end()) {
 			// add to list
-			unverified.push_back(new_connection);
+			//unverified.push_back(new_connection);
+			std::hash<std::string> hasher;
+			connections[hasher(addr)] = new_connection;
 			new_connection->start();
 		//}
 

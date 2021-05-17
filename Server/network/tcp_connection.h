@@ -36,22 +36,30 @@ private:
 	void handle_read_header(const asio::error_code& /*error*/);
 	void handle_read_body(const asio::error_code& /*error*/);
 
-	//void send(const Packet& packet);
+	bool send_packet(Packet::Type type, std::vector<char> &data) {
+		if (is_connected()) {
+			//message_ = make_daytime_string();
+			asio::async_write(socket_, asio::buffer(data),
+				std::bind(&TCPConnection::handle_write, shared_from_this(),
+					std::placeholders::_1 // placeholder for error
+					));
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
 
+private:
 	tcp::socket socket_;
 
-	//const unsigned int id;
-
-	// zip ~ 62%
-
 	Packet::Type in_packet_type;
-
-	static constexpr uint32_t HEADER_SIZE = 2; // fixed
 
 	UUID uuid;
 
 	// packet about 300-400 bytes (512 safe)
 	// 512 bytes is on the larger side for an ordinary tcp tx/rx packet
+	// zip ~ 62%
 
 };
 

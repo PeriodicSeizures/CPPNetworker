@@ -5,7 +5,6 @@
 #include <stdio.h>
 #include <iostream>
 #include <string>
-#include <asio.hpp>
 #include "network/tcp_connection.h"
 #include "network/tcp_server.h"
 

@@ -1,6 +1,7 @@
 #include <iostream>
 #include "tcp_connection.h"
 #include "tcp_server.h"
+#include "OwnedPacket.h"
 
 TCPConnection::pointer TCPConnection::create(asio::io_context& io_context) {
 	return pointer(new TCPConnection(io_context));
@@ -19,7 +20,7 @@ void TCPConnection::start() {
 	//		));
 
 	asio::async_read(socket_, 
-		asio::buffer((void*)in_packet_type, HEADER_SIZE),
+		asio::buffer((void*)in_packet_type, Packet::HEADER_SIZE),
 		std::bind(&TCPConnection::handle_read_header, shared_from_this(),
 			std::placeholders::_1 // placeholder for error
 			));
@@ -31,9 +32,10 @@ bool TCPConnection::is_connected() {
 }
 
 TCPConnection::TCPConnection(asio::io_context& io_context)
-	: socket_(io_context)//, std::enable_shared_from_this<tcp_connection>() // TEST SUPER
+	: socket_(io_context) //, std::enable_shared_from_this<tcp_connection>() // TEST SUPER
 {
-
+	std::hash<std::string> hasher;
+	uuid = hasher(socket_.remote_endpoint().address().to_string());
 }
 
 void TCPConnection::handle_write(const asio::error_code& e)
@@ -52,9 +54,10 @@ void TCPConnection::handle_read_header(const asio::error_code& e)
 
 		// Prepare packet for queue
 		OwnedPacket* owned_packet = new OwnedPacket();
-		main_server->incoming_packets.push_back(owned_packet);
-
 		owned_packet->type = in_packet_type;
+		owned_packet->owner = uuid;
+		
+		main_server->incoming_packets.push_back(owned_packet);
 
 		asio::async_read(socket_,
 			asio::buffer(owned_packet->data, Packet::sizes[(uint16_t)in_packet_type]),
@@ -75,7 +78,7 @@ void TCPConnection::handle_read_body(const asio::error_code& e) {
 		//std::cout << "incoming body: " << recv_buf << "\n";
 
 		asio::async_read(socket_,
-			asio::buffer((void*)in_packet_type, HEADER_SIZE),
+			asio::buffer((void*)in_packet_type, Packet::HEADER_SIZE),
 			std::bind(&TCPConnection::handle_read_header, shared_from_this(),
 				std::placeholders::_1 // placeholder for error
 			));

@@ -24,15 +24,15 @@
     <ClCompile Include="network\tcp_server.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="network\OwnedPacket.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="network\tcp_connection.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="network\tcp_server.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="network\OwnedPacket.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

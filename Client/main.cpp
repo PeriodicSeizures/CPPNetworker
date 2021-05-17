@@ -1,21 +1,19 @@
-/*
-	Simple udp client
-*/
 #include <stdio.h>
-//#include <winsock2.h>
 #include <iostream>
-//#include <Ws2tcpip.h>
 #include <tchar.h>
 #include <sstream>
 #include <fstream>
 #include <string>
 #include <queue>
+#include <asio.hpp>
 #include "chat/InputTextHandler.h"
 //#include <SDL_image.h>
 #include "GlobalContainer.h"
 #include "engine/Engine.h"
 #include "engine/SpriteEngine.h"
 #include "sprite/Player.h"
+
+#include "network/TCPClient.h"
 
 //#ifdef _WIN32
 //#define _WIN32_WINNT 0xA00
@@ -24,8 +22,6 @@
 //#include <asio.hpp>
 //#include <asio/ts/buffer.hpp>
 //#include <asio/ts/internet.hpp>
-
-//#pragma comment(lib,"ws2_32.lib") //Winsock Library
 
 #define SERVER "127.0.0.1"	//ip address of udp server
 #define BUFLEN 512	//Max length of buffer
@@ -36,7 +32,18 @@ int main(void)
 	Engine::init();
 	SpriteEngine::init();
 
+	try {
+		asio::io_context io_context;
+		TCPServer server(io_context);
 
+		TCPConnection::main_server = &server;
+
+		io_context.run();
+	}
+	catch (std::exception& e)
+	{
+		std::cout << "error: " << e.what() << "\n";
+	}
 
 
 	//std::thread tcp_task = std::thread(&TCPClient::beginListening, &tcp_client);

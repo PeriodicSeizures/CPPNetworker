@@ -72,6 +72,8 @@ namespace Packet {
 		//void onReceive(uint16_t user) override;
 	};
 
+	static constexpr uint32_t HEADER_SIZE = 2;
+
 	enum class Type : uint16_t {
 		SRC_SERVER_CONNECTION_REFUSED,
 		SRC_SERVER_CONNECTION_VERSION,	// version of server

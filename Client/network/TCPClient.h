@@ -1,36 +1,29 @@
 #ifndef TCP_CLIENT_H
 #define TCP_CLIENT_H
 
-#include <winsock2.h>
-#include <ws2tcpip.h>
-#include <thread>
+#ifdef _WIN32
+#define _WIN32_WINNT 0xA00
+#endif
+#define ASIO_STANDALONE
+#include <asio.hpp>
+
+using namespace asio::ip;
+
 #include "network/Packet.h"
 
 class TCPClient
 {
 private:
-	std::thread task;
-
-	bool listening;
-	SOCKET sock;
+	tcp::socket _socket;
 
 public:
-	TCPClient();
-	~TCPClient();
-
-public:
-	
-
-	void beginListeningAsync(const char* ip, uint16_t port);
-
-	void sendPacket(Packet* packet);
+	TCPClient(asio::io_context& _io_context, 
+		std::string host, std::string port);
 
 private:
-	void doListen();
+	void do_connect(const tcp::resolver::results_type& endpoints);
 
-	Packet* deserialize(ByteReader& reader);
-
-	void close();
+	void handle_read_header(const asio::error_code& e);
 };
 
 #endif
