@@ -9,9 +9,8 @@ using namespace asio::ip;
 
 struct OwnedPacket
 {
-	Packet::Type type;
-	std::vector<char> data;
 	UUID owner;
+	Packet packet;
 	//tcp::socket &socket_;
 };
 

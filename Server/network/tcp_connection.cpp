@@ -19,12 +19,8 @@ void TCPConnection::start() {
 	//		std::placeholders::_1 // placeholder for error
 	//		));
 
-	asio::async_read(socket_, 
-		asio::buffer((void*)in_packet_type, Packet::HEADER_SIZE),
-		std::bind(&TCPConnection::handle_read_header, shared_from_this(),
-			std::placeholders::_1 // placeholder for error
-			));
-
+	asio::error_code e; // dummy error
+	handle_read_header(e);
 }
 
 bool TCPConnection::is_connected() {
@@ -44,7 +40,25 @@ void TCPConnection::handle_write(const asio::error_code& e)
 	// ...
 }
 
-void TCPConnection::handle_read_header(const asio::error_code& e)
+
+void TCPConnection::handle_read_header(const asio::error_code& e) {
+	if (!e) {
+		//std::cout << "incoming body: " << recv_buf << "\n";
+
+		asio::async_read(socket_,
+			asio::buffer((void*)in_packet_type, Packet::HEADER_SIZE),
+			std::bind(&TCPConnection::handle_read_body, shared_from_this(),
+				std::placeholders::_1)
+		);
+	}
+	else {
+		std::cout << "body error: " << e.message() << "\n";
+		delete this;
+	}
+}
+
+
+void TCPConnection::handle_read_body(const asio::error_code& e)
 {
 	// optional something to do after data is received
 	// ...
@@ -53,15 +67,15 @@ void TCPConnection::handle_read_header(const asio::error_code& e)
 		std::cout << "incoming header: " << (uint16_t)in_packet_type << "\n";
 
 		// Prepare packet for queue
-		OwnedPacket* owned_packet = new OwnedPacket();
-		owned_packet->type = in_packet_type;
-		owned_packet->owner = uuid;
+		OwnedPacket owned_packet;
+		owned_packet.packet.type = in_packet_type;
+		owned_packet.owner = uuid;
 		
 		main_server->incoming_packets.push_back(owned_packet);
 
 		asio::async_read(socket_,
-			asio::buffer(owned_packet->data, Packet::sizes[(uint16_t)in_packet_type]),
-			std::bind(&TCPConnection::handle_read_body, shared_from_this(),
+			asio::buffer(owned_packet.packet.data, Packet::sizes[(uint16_t)in_packet_type]),
+			std::bind(&TCPConnection::handle_read_header, shared_from_this(),
 				std::placeholders::_1 // placeholder for error
 			));
 	}
@@ -70,22 +84,6 @@ void TCPConnection::handle_read_header(const asio::error_code& e)
 		// but need to somehow kill the connection
 		std::cout << "header error: " << e.message() << "\n";
 		delete this; // kills connection
-	}
-}
-
-void TCPConnection::handle_read_body(const asio::error_code& e) {
-	if (!e) {
-		//std::cout << "incoming body: " << recv_buf << "\n";
-
-		asio::async_read(socket_,
-			asio::buffer((void*)in_packet_type, Packet::HEADER_SIZE),
-			std::bind(&TCPConnection::handle_read_header, shared_from_this(),
-				std::placeholders::_1 // placeholder for error
-			));
-	}
-	else {
-		std::cout << "body error: " << e.message() << "\n";
-		delete this;
 	}
 }
 

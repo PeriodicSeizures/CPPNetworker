@@ -24,7 +24,7 @@ private:
 public:
 	bool send_packet(TCPConnection::pointer client, Packet::Type type, void* data);
 
-	AsyncQueue<OwnedPacket*> incoming_packets;
+	AsyncQueue<OwnedPacket> incoming_packets;
 
 	std::unordered_map<UUID, 
 		TCPConnection::pointer> connections;

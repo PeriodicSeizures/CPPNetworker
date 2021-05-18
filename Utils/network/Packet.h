@@ -16,7 +16,9 @@
 
 
 
-namespace Packet {
+struct Packet {
+
+
 
 	struct ConnectionRefused {
 		char message[16];
@@ -100,11 +102,20 @@ namespace Packet {
 	};
 
 	template<typename T>
-	void serialize(T& in, char* out) {
+	static void serialize(T& in, char* out) {
 		static_assert(std::is_pod<T>::value, "in is not a POD type");
 
 		std::memcpy(out, (void*)&in, sizeof(T));
 	}
+
+	/*
+	* 
+	* Members
+	* 	
+	*/
+
+	Type type;
+	std::vector<char> data;
 };
 
 #endif
