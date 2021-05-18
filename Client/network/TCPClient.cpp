@@ -86,6 +86,7 @@ void TCPClient::send_packet(Packet& packet) {
 	out_packet_queue.push_back(packet);
 }
 
+
 void TCPClient::do_connect(const tcp::resolver::results_type& endpoints) {
 	asio::async_connect(_socket, endpoints,
 		std::bind(&TCPClient::handle_read_header,
@@ -96,7 +97,7 @@ void TCPClient::do_connect(const tcp::resolver::results_type& endpoints) {
 void TCPClient::handle_read_header(const asio::error_code& e) {
 	if (!e) {
 		asio::async_read(_socket,
-			asio::buffer((void*)in_packet_type, Packet::HEADER_SIZE),
+			asio::buffer((void*)in_packet_type, Packet::SIZE),
 			std::bind(&TCPClient::handle_read_body, this,
 				std::placeholders::_1
 			));
@@ -116,7 +117,7 @@ void TCPClient::handle_read_body(const asio::error_code& e) {
 		in_packet_queue.push_back(packet);
 
 		asio::async_read(_socket,
-			asio::buffer(packet.data, Packet::sizes[(uint16_t)in_packet_type]),
+			asio::buffer(packet.data, Packet::S(in_packet_type)),
 			std::bind(&TCPClient::handle_read_header, this,
 				std::placeholders::_1
 			));
@@ -132,7 +133,7 @@ void TCPClient::handle_send_header(const asio::error_code& e) {
 		out_packet_queue.pop_front();
 
 		asio::async_write(_socket,
-			asio::buffer((void*)(out_packet_queue.front().type), sizeof(Packet::Type)),
+			asio::buffer((void*)(out_packet_queue.front().type), Packet::SIZE),
 			std::bind(&TCPClient::handle_send_body, this, std::placeholders::_1)
 		);
 	}

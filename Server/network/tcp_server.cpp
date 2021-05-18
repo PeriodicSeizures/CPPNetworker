@@ -1,18 +1,20 @@
 #include "tcp_server.h"
 
-TCPServer::TCPServer(asio::io_context& io_context) 
-	: io_context_(io_context), 
-	acceptor_(io_context, tcp::endpoint(tcp::v4(), 13))
+TCPServer::TCPServer() : 
+	_acceptor(_io_context, tcp::endpoint(tcp::v4(), 13))
 {
 	start_accept();
 }
 
 void TCPServer::start_accept() 
 {
-	TCPConnection::pointer new_connection =
-		TCPConnection::create(io_context_);
+	//std::hash<std::string> hasher;
+	//UUID uuid = hasher(socket_.remote_endpoint().address().to_string());
 
-	acceptor_.async_accept(new_connection->socket(),
+	TCPConnection::pointer new_connection =
+		TCPConnection::create();
+
+	_acceptor.async_accept(new_connection->socket(),
 		std::bind(&TCPServer::handle_accept, 
 			this, 
 			new_connection,
@@ -38,12 +40,6 @@ void TCPServer::handle_accept(TCPConnection::pointer new_connection,
 	this->start_accept(); // loops back to give work
 }
 
-bool TCPServer::send_packet(TCPConnection::pointer connection, Packet::Type type, void* data) {
-	
-}
-
-bool TCPServer::verify(TCPConnection::pointer connection) {
-
-
-
-}
+//void TCPServer::send_packet(TCPConnection::pointer connection, Packet::Type type, void* data) {
+//	connection->send_packet();
+//}

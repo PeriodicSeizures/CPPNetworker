@@ -18,8 +18,6 @@
 
 struct Packet {
 
-
-
 	struct ConnectionRefused {
 		char message[16];
 		//void onReceive(uint16_t user) override;
@@ -74,8 +72,6 @@ struct Packet {
 		//void onReceive(uint16_t user) override;
 	};
 
-	static constexpr uint32_t HEADER_SIZE = 2;
-
 	enum class Type : uint16_t {
 		SRC_SERVER_CONNECTION_REFUSED,
 		SRC_SERVER_CONNECTION_VERSION,	// version of server
@@ -89,6 +85,27 @@ struct Packet {
 		count // kind of hacky
 	};
 
+	static constexpr unsigned int SIZE = sizeof(Type);
+
+	static uint16_t S(Type type);
+
+	//template<typename T>
+	//static void serialize(T& in, char* out) {
+	//	static_assert(std::is_pod<T>::value, "in is not a POD type");
+	//
+	//	std::memcpy(out, (void*)&in, sizeof(T));
+	//}
+
+	/*
+	* 
+	* Members
+	* 	
+	*/
+
+	Type type;
+	char* data;
+
+private:
 	static constexpr size_t sizes[] = {
 		sizeof(ConnectionRefused),
 		sizeof(ConnectionVersion),
@@ -100,22 +117,11 @@ struct Packet {
 		sizeof(TrustedMotion),
 		sizeof(UnTrustedMotion),
 	};
+};
 
-	template<typename T>
-	static void serialize(T& in, char* out) {
-		static_assert(std::is_pod<T>::value, "in is not a POD type");
-
-		std::memcpy(out, (void*)&in, sizeof(T));
-	}
-
-	/*
-	* 
-	* Members
-	* 	
-	*/
-
-	Type type;
-	std::vector<char> data;
+struct OwnedPacket {
+	UUID uuid;
+	Packet packet;
 };
 
 #endif
