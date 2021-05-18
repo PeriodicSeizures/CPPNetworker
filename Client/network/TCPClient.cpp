@@ -83,32 +83,7 @@ _socket.close();
 */
 
 void TCPClient::send_packet(Packet& packet) {
-	// first send header
-	asio::async_write(_socket,
-		asio::buffer((void*)(packet.type), sizeof(Packet::Type)),
-		std::bind()
-		[this](const asio::error_code& e)
-	{
-		if (!e) {
-			// second send data
-			asio::async_write(_socket,
-				asio::buffer((void*)packet->type, Packet::HEADER_SIZE),
-				[this](const asio::error_code& e)
-			{
-				if (!e) {
-
-				}
-				else {
-					std::cout << "send_packet body error: " << e.message() << "\n";
-					_socket.close();
-				}
-			}
-		}
-		else {
-			std::cout << "send_packet header error: " << e.message() << "\n";
-			_socket.close();
-		}
-	}
+	out_packet_queue.push_back(packet);
 }
 
 void TCPClient::do_connect(const tcp::resolver::results_type& endpoints) {
@@ -153,6 +128,9 @@ void TCPClient::handle_read_body(const asio::error_code& e) {
 
 void TCPClient::handle_send_header(const asio::error_code& e) {
 	if (!e) {
+		// pop prev body packet
+		out_packet_queue.pop_front();
+
 		asio::async_write(_socket,
 			asio::buffer((void*)(out_packet_queue.front().type), sizeof(Packet::Type)),
 			std::bind(&TCPClient::handle_send_body, this, std::placeholders::_1)
@@ -165,5 +143,14 @@ void TCPClient::handle_send_header(const asio::error_code& e) {
 }
 
 void TCPClient::handle_send_body(const asio::error_code& e) {
-
+	if (!e) {
+		asio::async_write(_socket,
+			asio::buffer(out_packet_queue.front().data),
+			std::bind(&TCPClient::handle_send_body, this, std::placeholders::_1)
+		);
+	}
+	else {
+		std::cout << "send_packet body error: " << e.message() << "\n";
+		_socket.close();
+	}
 }
