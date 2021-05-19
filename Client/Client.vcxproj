@@ -156,17 +156,17 @@
     <ClCompile Include="engine\Engine.cpp" />
     <ClCompile Include="engine\SpriteEngine.cpp" />
     <ClCompile Include="GlobalContainer.cpp" />
-    <ClCompile Include="network\TCPClient.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="sprite\Player.cpp" />
+    <ClCompile Include="task\Task.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="chat\InputTextHandler.h" />
     <ClInclude Include="engine\Engine.h" />
     <ClInclude Include="engine\SpriteEngine.h" />
     <ClInclude Include="GlobalContainer.h" />
-    <ClInclude Include="network\TCPClient.h" />
     <ClInclude Include="sprite\Player.h" />
+    <ClInclude Include="task\Task.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="chat_to_send.txt" />

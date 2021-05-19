@@ -1,6 +1,7 @@
-#pragma once
+#ifndef TCP_SERVER_H
+#define TCP_SERVER_H
+
 #include <asio.hpp>
-#include <set>
 #include "network/tcp_connection.h"
 
 using namespace asio::ip;
@@ -13,7 +14,7 @@ private:
 	std::unordered_map<UUID, TCPConnection::pointer> connections;
 
 public:
-	TCPServer();
+	TCPServer(unsigned short port);
 	void send_packet(TCPConnection::pointer client, Packet::Type type, void* data);
 	//void process_packet(TCPConnection::pointer client, Packet packet);
 
@@ -23,3 +24,5 @@ private:
 		const asio::error_code& e);
 
 };
+
+#endif

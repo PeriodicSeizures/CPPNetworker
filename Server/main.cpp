@@ -11,12 +11,7 @@
 int main()
 {
 	try {
-		asio::io_context io_context;
-		TCPServer server(io_context);
-
-		TCPConnection::main_server = &server;
-
-		io_context.run();
+		TCPServer server(13);
 	}
 	catch (std::exception& e)
 	{

@@ -1,30 +1,15 @@
 #include <stdio.h>
 #include <iostream>
-#include <tchar.h>
-#include <sstream>
-#include <fstream>
 #include <string>
-#include <queue>
-#include <asio.hpp>
 #include "chat/InputTextHandler.h"
 //#include <SDL_image.h>
 #include "GlobalContainer.h"
 #include "engine/Engine.h"
 #include "engine/SpriteEngine.h"
 #include "sprite/Player.h"
+#include "network/tcp_connection.h"
 
-#include "network/TCPClient.h"
-
-//#ifdef _WIN32
-//#define _WIN32_WINNT 0xA00
-//#endif
-//#define ASIO_STANDALONE
-//#include <asio.hpp>
-//#include <asio/ts/buffer.hpp>
-//#include <asio/ts/internet.hpp>
-
-#define SERVER "127.0.0.1"	//ip address of udp server
-#define BUFLEN 512	//Max length of buffer
+#define SERVER "127.0.0.1"	//ip address of tcp server
 #define PORT 8888	//The port on which to listen for incoming data
 
 int main(void)
@@ -33,10 +18,9 @@ int main(void)
 	SpriteEngine::init();
 
 	try {
-		asio::io_context io_context;
-		TCPServer server(io_context);
-
-		TCPConnection::main_server = &server;
+		crzi::NetworkingGame::instance->connection->connect_to_server(io_context, 
+			SERVER, 
+			std::to_string(PORT));
 
 		io_context.run();
 	}
@@ -48,7 +32,6 @@ int main(void)
 
 	//std::thread tcp_task = std::thread(&TCPClient::beginListening, &tcp_client);
 
-	GlobalContainer::tcp_client.beginListeningAsync("192.168.1.200", 8888);
 
 
 
@@ -90,7 +73,8 @@ int main(void)
 		SDL_Event e;
 		while (SDL_PollEvent(&e))
 		{
-			bool chatting = GlobalContainer::input_text_handler.processInput(e);
+			
+			bool chatting = crzi::NetworkingGame::instance->input_text_handler.processInput(e);
 
 			switch (e.type)
 			{
@@ -128,7 +112,7 @@ int main(void)
 		if (render) {
 			Engine::fill({0, 0, 0, 255});
 
-			GlobalContainer::input_text_handler.render();
+			crzi::NetworkingGame::instance->input_text_handler.render();
 
 			player.render();
 

@@ -1,9 +1,10 @@
 #include "tcp_server.h"
 
-TCPServer::TCPServer() : 
-	_acceptor(_io_context, tcp::endpoint(tcp::v4(), 13))
+TCPServer::TCPServer(unsigned short port) : 
+	_acceptor(_io_context, tcp::endpoint(tcp::v4(), port))
 {
 	start_accept();
+	_io_context.run();
 }
 
 void TCPServer::start_accept() 
@@ -12,13 +13,14 @@ void TCPServer::start_accept()
 	//UUID uuid = hasher(socket_.remote_endpoint().address().to_string());
 
 	TCPConnection::pointer new_connection =
-		TCPConnection::create();
+		TCPConnection::create(_io_context);
 
 	_acceptor.async_accept(new_connection->socket(),
 		std::bind(&TCPServer::handle_accept, 
 			this, 
 			new_connection,
-			std::placeholders::_1));
+			std::placeholders::_1)
+	);
 }
 
 void TCPServer::handle_accept(TCPConnection::pointer new_connection,
@@ -32,7 +34,7 @@ void TCPServer::handle_accept(TCPConnection::pointer new_connection,
 			//unverified.push_back(new_connection);
 			std::hash<std::string> hasher;
 			connections[hasher(addr)] = new_connection;
-			new_connection->start();
+			new_connection->start_reading();
 		//}
 
 	}

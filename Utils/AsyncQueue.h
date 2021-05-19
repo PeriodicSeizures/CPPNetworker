@@ -1,4 +1,6 @@
-#pragma once
+#ifndef ASYNCQUEUE_H
+#define ASYNCQUEUE_H
+
 #include <memory>
 #include <thread>
 #include <mutex>
@@ -107,3 +109,5 @@ protected:
 	std::condition_variable cvBlocking;
 	std::mutex muxBlocking;
 };
+
+#endif

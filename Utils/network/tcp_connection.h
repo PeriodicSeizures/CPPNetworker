@@ -8,12 +8,10 @@
 #include "Packet.h"
 #include "../AsyncQueue.h"
 
-class TCPServer;
-
 #ifdef _WIN32
 #define _WIN32_WINNT 0x0A00
 #endif
-#define ASIO_STANDALONE
+#define ASIO_STANDALONE 1
 
 using namespace asio::ip;
 
@@ -22,42 +20,42 @@ class TCPConnection : public std::enable_shared_from_this<TCPConnection>
 private:
 	tcp::socket _socket;
 	Packet::Type in_packet_type;
-	//UUID uuid;
 	AsyncQueue<Packet> in_packets;
 	AsyncQueue<Packet> out_packets;
-
-	static asio::io_context* _io_context;
 
 public:
 	typedef std::shared_ptr<TCPConnection> pointer;
 
-	static void init_io_context(asio::io_context &_io_context);
-	static pointer create();
+	//static void init_io_context(asio::io_context &_io_context);
+	static pointer create(asio::io_context& _io_context);
 
 	tcp::socket& socket();
-	void start();
+	
 	bool is_connected();
 	void send_packet(Packet &packet);
 
 	/*
-	* To connect to server (used by client)
+	* Used by server 
+	* Client safe, but there's conect_to_server...
 	*/
-	void connect_to_server(std::string host, std::string port);
+	void start_reading();
 
 	/*
-	* To 
+	* To connect to server (used by client)
+	* Might cause issues if used on a server architecture
 	*/
+	void connect_to_server(asio::io_context& _io_context, 
+		std::string host, 
+		std::string port);
 
 private:
-	TCPConnection();
+	TCPConnection(asio::io_context& _io_context);
 
-	void handle_read_header(const asio::error_code& e);
-	void handle_read_body(const asio::error_code& e);
+	void read_header();
+	void read_body();
 
-	void handle_write_header(const asio::error_code& e);
-	void handle_write_body(const asio::error_code& e);
-
-
+	void write_header();
+	void write_body();
 
 	// packet about 300-400 bytes (512 safe)
 	// 512 bytes is on the larger side for an ordinary tcp tx/rx packet
