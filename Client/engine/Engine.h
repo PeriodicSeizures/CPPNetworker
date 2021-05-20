@@ -22,4 +22,6 @@ namespace Engine {
 		const SDL_Color& color, int size, bool centered);
 
 	void fill(const SDL_Color& color);
+
+	void fillRect(const SDL_Color& color, const SDL_Rect& rect);
 }

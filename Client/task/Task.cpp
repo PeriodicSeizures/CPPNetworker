@@ -1,17 +1,14 @@
 #include "Task.h"
 
-void Task::on_render() {
-
-}
-
-void Task::on_tick() {
-
-}
-
-void Task::on_event() {
-
-}
-
 void Task::focus() {
+	prev_task = current_task;
 	current_task = this;
 }
+
+/*
+* static defines
+*/
+
+Task* Task::current_task;
+Task* Task::prev_task;
+TCPConnection::pointer Task::connection;

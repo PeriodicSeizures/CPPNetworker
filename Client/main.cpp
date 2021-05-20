@@ -1,9 +1,7 @@
 #include <stdio.h>
 #include <iostream>
 #include <string>
-#include "chat/InputTextHandler.h"
-//#include <SDL_image.h>
-#include "GlobalContainer.h"
+#include "task/Task.h"
 #include "engine/Engine.h"
 #include "engine/SpriteEngine.h"
 #include "sprite/Player.h"
@@ -18,51 +16,17 @@ int main(void)
 	SpriteEngine::init();
 
 	try {
-		crzi::NetworkingGame::instance->connection->connect_to_server(io_context, 
-			SERVER, 
-			std::to_string(PORT));
 
-		io_context.run();
+		//Task::connection->connect_to_server(io_context, 
+		//	SERVER, 
+		//	std::to_string(PORT));
+		//
+		//io_context.run();
 	}
 	catch (std::exception& e)
 	{
 		std::cout << "error: " << e.what() << "\n";
 	}
-
-
-	//std::thread tcp_task = std::thread(&TCPClient::beginListening, &tcp_client);
-
-
-
-
-
-
-
-
-	//std::string line;
-	//
-	//const char* filename = "chat_to_send.txt";
-	//std::ifstream infile(filename);
-	//
-	//if (!infile.is_open())
-	//	printf("couldn't find %s\n", filename);
-	//
-	//std::queue<std::string> chat_strings_to_send;
-	//
-	//while (std::getline(infile, line)) {
-	//	chat_strings_to_send.push(line);
-	//}
-	//
-	//while (!chat_strings_to_send.empty()) {
-	//	PacketChat packet(chat_strings_to_send.front());
-	//	chat_strings_to_send.pop();
-	//	tcp_client.sendPacket(&packet);
-	//
-	//}
-
-	//Engine::drawString("Hello world", 400, 300, 8, true);
-
-	//SDL_StartTextInput();
 
 	Player player;
 
@@ -73,8 +37,8 @@ int main(void)
 		SDL_Event e;
 		while (SDL_PollEvent(&e))
 		{
-			
-			bool chatting = crzi::NetworkingGame::instance->input_text_handler.processInput(e);
+			Task::current_task->on_event(e);
+			//bool chatting = crzi::NetworkingGame::instance->input_text_handler.processInput(e);
 
 			switch (e.type)
 			{
@@ -86,21 +50,16 @@ int main(void)
 				case SDL_WINDOWEVENT_SHOWN:
 				case SDL_WINDOWEVENT_EXPOSED:
 				case SDL_WINDOWEVENT_MAXIMIZED:
-				//case SDL_WINDOWEVENT_ENTER:
+					//case SDL_WINDOWEVENT_ENTER:
 				case SDL_WINDOWEVENT_FOCUS_GAINED:
-				//case SDL_WINDOWEVENT_TAKE_FOCUS:
+					//case SDL_WINDOWEVENT_TAKE_FOCUS:
 					render = true;
 					break;
 				case SDL_WINDOWEVENT_HIDDEN:
 				case SDL_WINDOWEVENT_MINIMIZED:
-				//case SDL_WINDOWEVENT_LEAVE:
+					//case SDL_WINDOWEVENT_LEAVE:
 				case SDL_WINDOWEVENT_FOCUS_LOST:
 					render = false;
-					break;
-				}
-			case SDL_KEYDOWN:
-				if (!chatting) {
-					// game events
 					break;
 				}
 			}
@@ -112,7 +71,7 @@ int main(void)
 		if (render) {
 			Engine::fill({0, 0, 0, 255});
 
-			crzi::NetworkingGame::instance->input_text_handler.render();
+			//crzi::NetworkingGame::instance->input_text_handler.render();
 
 			player.render();
 

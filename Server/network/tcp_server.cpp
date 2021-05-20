@@ -24,7 +24,7 @@ void TCPServer::start_accept()
 }
 
 void TCPServer::handle_accept(TCPConnection::pointer new_connection,
-	const asio::error_code& e)
+	const std::error_code& e)
 {
 	if (!e)
 	{

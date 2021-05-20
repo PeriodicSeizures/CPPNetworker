@@ -35,7 +35,7 @@ TCPConnection::TCPConnection(asio::io_context &_io_context)
 void TCPConnection::read_header() {
 	asio::async_read(_socket,
 		asio::buffer((void*)in_packet_type, Packet::SIZE),
-		[this](std::error_code &e) {
+		[this](const std::error_code &e, size_t) {
 		if (!e) {
 			read_body();
 		}
@@ -49,10 +49,10 @@ void TCPConnection::read_header() {
 
 void TCPConnection::read_body() {
 	in_packets.push_back({ in_packet_type, new char[Packet::S(in_packet_type)] });
-
+	
 	asio::async_read(_socket,
 		asio::buffer((void*)(in_packets.back().data), Packet::S(in_packet_type)),
-		[this](std::error_code& e) {
+		[this](const std::error_code& e, size_t) {
 		if (!e) {
 			std::cout << "incoming header: " << (uint16_t)in_packet_type << "\n";
 			read_header();
@@ -69,7 +69,7 @@ void TCPConnection::write_header() {
 	if (!out_packets.empty()) {
 		asio::async_write(_socket,
 			asio::buffer((void*)(out_packets.front().type), Packet::SIZE),
-			[this](std::error_code& e) {
+			[this](const std::error_code& e, size_t) {
 			if (!e) {
 				write_body();
 			}
@@ -85,7 +85,7 @@ void TCPConnection::write_header() {
 void TCPConnection::write_body() {
 	asio::async_write(_socket,
 		asio::buffer((void*)(out_packets.front().data), Packet::S(out_packets.front().type)),
-		[this](std::error_code& e) {
+		[this](const std::error_code& e, size_t) {
 		if (!e) {
 			write_header();
 		}

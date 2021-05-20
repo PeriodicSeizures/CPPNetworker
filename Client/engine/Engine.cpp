@@ -216,8 +216,12 @@ namespace Engine {
     }
 
     void fill(const SDL_Color &color) {
-        SDL_SetRenderDrawColor(sdl_renderer, 0, 0, 0, 0);
+        SDL_SetRenderDrawColor(sdl_renderer, color.r, color.g, color.b, color.a);
         SDL_RenderFillRect(sdl_renderer, NULL);
+    }
+
+    void fillRect(const SDL_Color& color, const SDL_Rect& rect) {
+        SDL_RenderFillRect(sdl_renderer, &rect);
     }
 
 }

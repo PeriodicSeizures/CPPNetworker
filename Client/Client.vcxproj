@@ -90,6 +90,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>D:\CPPLibraries\SDL2\include;D:\CPPLibraries\SDL2_image\include;$(SolutionDir)Utils;D:\CPPLibraries\asio-1.18.1\include</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -107,6 +108,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>D:\CPPLibraries\SDL2\include;D:\CPPLibraries\SDL2_image\include;$(SolutionDir)Utils;D:\CPPLibraries\asio-1.18.1\include</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -124,6 +126,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>D:\CPPLibraries\SDL2\include;D:\CPPLibraries\SDL2_image\include;$(SolutionDir)Utils;D:\CPPLibraries\asio-1.18.1\include</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -141,6 +144,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>D:\CPPLibraries\SDL2\include;D:\CPPLibraries\SDL2_image\include;$(SolutionDir)Utils;D:\CPPLibraries\asio-1.18.1\include</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -152,24 +156,27 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="chat\InputTextHandler.cpp" />
     <ClCompile Include="engine\Engine.cpp" />
     <ClCompile Include="engine\SpriteEngine.cpp" />
-    <ClCompile Include="GlobalContainer.cpp" />
+    <ClCompile Include="gui\GUIButton.cpp" />
+    <ClCompile Include="gui\GUIElement.cpp" />
+    <ClCompile Include="gui\GUILabel.cpp" />
+    <ClCompile Include="gui\GUITextInput.cpp" />
+    <ClCompile Include="task\CommandTask.cpp" />
+    <ClCompile Include="task\GUITask.cpp" />
+    <ClCompile Include="task\MainMenuTask.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="sprite\Player.cpp" />
+    <ClCompile Include="task\PauseMenuTask.cpp" />
     <ClCompile Include="task\Task.cpp" />
+    <ClCompile Include="task\WorldTask.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="chat\InputTextHandler.h" />
     <ClInclude Include="engine\Engine.h" />
     <ClInclude Include="engine\SpriteEngine.h" />
-    <ClInclude Include="GlobalContainer.h" />
+    <ClInclude Include="gui\GUIElement.h" />
     <ClInclude Include="sprite\Player.h" />
     <ClInclude Include="task\Task.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="chat_to_send.txt" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Utils\Utils.vcxproj">

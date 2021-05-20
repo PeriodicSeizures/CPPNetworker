@@ -9,9 +9,11 @@ using namespace asio::ip;
 class TCPServer
 {
 private:
-	tcp::acceptor _acceptor;
-	asio::io_context _io_context;
+	// Order of these is apparently important 
 	std::unordered_map<UUID, TCPConnection::pointer> connections;
+
+	asio::io_context _io_context;
+	tcp::acceptor _acceptor;	
 
 public:
 	TCPServer(unsigned short port);
@@ -21,7 +23,7 @@ public:
 private:
 	void start_accept();
 	void handle_accept(TCPConnection::pointer new_connection,
-		const asio::error_code& e);
+		const std::error_code& e);
 
 };
 
