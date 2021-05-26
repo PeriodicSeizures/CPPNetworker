@@ -15,16 +15,20 @@
 
 int main()
 {
-	// open settings file
-
 	TCPServer server(13);
 
 	server.start();
 
+	/*
+	* poll incoming packets on main thread
+	*/
 	while (true) {
 		for (auto&& entry : server.connections) {
 
-			//entry.second->in_packets.
+			/*
+			* it is safe to remove every packet, except for the newest one
+			* the newest packet might be unfinished
+			*/
 			while (entry.second->in_packets.count() > 1) {
 				auto e = entry.second->in_packets.pop_front();
 				uint16_t len = 0;
