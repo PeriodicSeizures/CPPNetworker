@@ -41,7 +41,7 @@ void TCPServer::do_accept()
 
 			auto conn = std::make_shared<TCPConnection>(std::move(socket));
 
-			//connections.insert({ uuid, conn });
+			connections.insert({ uuid, conn });
 
 			conn->start();
 
