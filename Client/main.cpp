@@ -1,3 +1,5 @@
+#define SDL_MAIN_HANDLED
+#include <SDL.h>
 #include <stdio.h>
 #include <iostream>
 #include <string>
@@ -7,13 +9,27 @@
 #include "sprite/Player.h"
 #include "network/tcp_connection.h"
 
-#define SERVER "127.0.0.1"	//ip address of tcp server
-#define PORT 8888	//The port on which to listen for incoming data
+//void HANDLER_CALLBACK(const std::error_code&) {
+//	std::cout << "callback!\n";
+//}
 
 int main(void)
 {
+	//asio::io_context io;
+	//asio::steady_timer t(io, asio::chrono::seconds(5));
+	//t.async_wait(&HANDLER_CALLBACK);
+	//io.run();
+	//return 0;
+	//
+
+
+
 	Engine::init();
 	SpriteEngine::init();
+
+	Task::init();
+
+	MAIN_MENU_TASK.focus();
 
 	try {
 
@@ -33,7 +49,11 @@ int main(void)
 	bool alive = true;
 	bool render = true;
 	while (alive) {
-
+		// can experiment this to decrease cpu usage
+		// still seems pretty responsive, and much less cpu usage
+		// however might screw with timings in the long run, so yea...
+		// test things out
+		std::this_thread::sleep_for(std::chrono::milliseconds(10));
 		SDL_Event e;
 		while (SDL_PollEvent(&e))
 		{
@@ -75,6 +95,8 @@ int main(void)
 
 			player.render();
 
+			Task::current_task->on_render();
+
 			Engine::doRender();
 		}
 		//Sleep(1000);
@@ -89,7 +111,7 @@ int main(void)
 	SpriteEngine::uninit();
 	Engine::uninit();
 
-
+	Task::uninit();
 
 	return 0;
 

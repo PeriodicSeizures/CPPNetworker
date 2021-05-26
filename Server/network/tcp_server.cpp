@@ -1,47 +1,71 @@
 #include "tcp_server.h"
 
+std::thread TCPServer::run_thread;
+asio::io_context TCPServer::_io_context;
+
 TCPServer::TCPServer(unsigned short port) : 
 	_acceptor(_io_context, tcp::endpoint(tcp::v4(), port))
 {
-	start_accept();
-	_io_context.run();
+	do_accept();
+
+	//TCPServer::_io_context.run();
 }
 
-void TCPServer::start_accept() 
+void TCPServer::start() {
+	TCPServer::run_thread = std::thread(
+		[]() 
+		{
+			_io_context.run();
+			//TCPServer::_io_context.poll();
+			//std::cout << "exited run\n";
+			
+			std::cout << "exited run\n";
+		}
+	);
+}
+
+void TCPServer::do_accept() 
 {
 	//std::hash<std::string> hasher;
 	//UUID uuid = hasher(socket_.remote_endpoint().address().to_string());
 
-	TCPConnection::pointer new_connection =
-		TCPConnection::create(_io_context);
-
-	_acceptor.async_accept(new_connection->socket(),
-		std::bind(&TCPServer::handle_accept, 
-			this, 
-			new_connection,
-			std::placeholders::_1)
-	);
-}
-
-void TCPServer::handle_accept(TCPConnection::pointer new_connection,
-	const std::error_code& e)
-{
-	if (!e)
+	_acceptor.async_accept(
+		[this](const asio::error_code& ec, tcp::socket socket)
 	{
-		std::string addr = new_connection->socket().remote_endpoint().address().to_string();
-		//if (ip_ban_list.find(addr) == ip_ban_list.end()) {
-			// add to list
-			//unverified.push_back(new_connection);
+		if (!ec)
+		{
+			std::cout << "connect\n";
+
 			std::hash<std::string> hasher;
-			connections[hasher(addr)] = new_connection;
-			new_connection->start_reading();
-		//}
+			UUID uuid = hasher(socket.remote_endpoint().address().to_string());
 
-	}
+			auto conn = std::make_shared<TCPConnection>(std::move(socket));
 
-	this->start_accept(); // loops back to give work
+			//connections.insert({ uuid, conn });
+
+			conn->start();
+
+			//asio::steady_timer timer(_io_context);
+			//timer.expires_after(std::chrono::seconds(5));
+			//timer.async_wait([conn](const asio::error_code&) {
+			//	Packet::Chat32 chat32 = {"Hello, World!"};
+			//	conn->send_packet(Packet::serialize(chat32, chat32.type));
+			//	});
+
+			//std::make_shared<TCPConnection>(_io_context, std::move(socket))->start();
+		}
+		
+		do_accept(); // loops back to continue accept
+	});
+
+
+	/*
+	* jsut print all incoming messages 
+	*/
+	//while (true) {
+	//	for (auto&& entry : connections) {
+	//		//entry.second->
+	//	}
+	//}
+
 }
-
-//void TCPServer::send_packet(TCPConnection::pointer connection, Packet::Type type, void* data) {
-//	connection->send_packet();
-//}

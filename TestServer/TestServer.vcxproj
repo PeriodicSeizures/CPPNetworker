@@ -19,9 +19,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ASYNC_TCP_ECHO_SERVER.cpp" />
     <ClCompile Include="tcp_connection.cpp" />
     <ClCompile Include="tcp_server.cpp" />
-    <ClCompile Include="TestASIOServer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="tcp_connection.h" />
@@ -127,7 +127,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>D:\CPPLibraries\asio-1.18.1\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\libs\asio-1.18.2\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -142,7 +142,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>D:\CPPLibraries\asio-1.18.1\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\libs\asio-1.18.2\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

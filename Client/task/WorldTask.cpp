@@ -2,6 +2,10 @@
 
 WorldTask WORLD_TASK;
 
+WorldTask::WorldTask() {
+
+}
+
 void WorldTask::on_render() {
 	// draw entities and world
 

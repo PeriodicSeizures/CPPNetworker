@@ -3,7 +3,7 @@
 GUILabel::GUILabel(int x, int y, 
 	int size, bool centered, 
 	std::string text)
-	: GUIElement(x, y), 
+	: GUIElement(x, y, 0, 0), 
 		size(size), centered(centered), 
 		text(text) { }
 

@@ -18,61 +18,8 @@
 
 struct Packet {
 
-	struct ConnectionRefused {
-		char message[16];
-		//void onReceive(uint16_t user) override;
-	};
-
-	struct ConnectionVersion {
-		char message[16];
-		//void onReceive(uint16_t user) override;
-	};
-
-	struct ConnectionLogin {
-		char username[16];
-		char password[16];
-		//void onReceive(uint16_t user) override;
-	};
-
-	struct Chat32 {
-		char message[32];
-		char target[16]; // optional 
-		//void onReceive(uint16_t user) override;
-	};
-
-	struct Chat64 {
-		char message[64];
-		char target[16]; // optional 
-		//void onReceive(uint16_t user) override;
-	};
-
-	struct Chat128 {
-		char message[128];
-		char target[16]; // optional 
-		//void onReceive(uint16_t user) override;
-	};
-
-	struct Chat256 {
-		char message[256];
-		char target[16]; // optional 
-		//void onReceive(uint16_t user) override;
-	};
-
-	// for clients that are not exploitive (trust)
-	struct TrustedMotion { // client calculates motion (cheaper for server)
-		float x, y;
-		float vx, vy;
-		Direction dir;
-		//void onReceive(uint16_t user) override;
-	};
-
-	// for clients that might be exploitive (ignore)
-	struct UnTrustedMotion { // server calculates motion (expensive for server)
-		Input input;
-		//void onReceive(uint16_t user) override;
-	};
-
 	enum class Type : uint16_t {
+		DUMMY,
 		SRC_SERVER_CONNECTION_REFUSED,
 		SRC_SERVER_CONNECTION_VERSION,	// version of server
 		SRC_CLIENT_CONNECTION_LOGIN,	// identity of client
@@ -85,20 +32,101 @@ struct Packet {
 		count // kind of hacky
 	};
 
-	static constexpr unsigned int SIZE = sizeof(Type);
+	/*
+	* 
+	* Packet declarations
+	* 
+	*/
 
-	static uint16_t S(Type type);
+	struct ConnectionRefused {
+		static constexpr Packet::Type type = Packet::Type::SRC_SERVER_CONNECTION_REFUSED;
+		char message[16];
+	};
 
-	//template<typename T>
-	//static void serialize(T& in, char* out) {
-	//	static_assert(std::is_pod<T>::value, "in is not a POD type");
-	//
-	//	std::memcpy(out, (void*)&in, sizeof(T));
-	//}
+	struct ConnectionVersion {
+		static constexpr Packet::Type type = Packet::Type::SRC_SERVER_CONNECTION_VERSION;
+		char message[16];
+	};
+
+	struct ConnectionLogin {
+		static constexpr Packet::Type type = Packet::Type::SRC_CLIENT_CONNECTION_LOGIN;
+		char username[16];
+		char password[16];
+	};
+
+	struct Chat32 {
+		static constexpr Packet::Type type = Packet::Type::CHAT32;
+		char message[32];
+		char target[16] = ""; // optional 
+	};
+
+	struct Chat64 {
+		static constexpr Packet::Type type = Packet::Type::CHAT64;
+		char message[64];
+		char target[16] = ""; // optional 
+	};
+
+	struct Chat128 {
+		static constexpr Packet::Type type = Packet::Type::CHAT128;
+		char message[128];
+		char target[16] = ""; // optional 
+	};
+
+	struct Chat256 {
+		static constexpr Packet::Type type = Packet::Type::CHAT256;
+		char message[256];
+		char target[16] = ""; // optional 
+	};
+
+	// trust the client motion
+	struct TrustedMotion { //  (cheaper for server)
+		static constexpr Packet::Type type = Packet::Type::SRC_CLIENT_TRUSTED_MOTION;
+		float x, y;
+		float vx, vy;
+		Direction dir;
+	};
+
+	// fuck the clients motion
+	struct UnTrustedMotion { // (expensive for server)
+		static constexpr Packet::Type type = Packet::Type::SRC_CLIENT_UNTRUSTED_MOTION;
+		Input input;
+	};
 
 	/*
 	* 
-	* Members
+	* Utility methods and types
+	* 
+	*/
+
+	enum class ErrorCode : uint16_t {
+		OK = 0,
+		INVALID_HEADER
+	};
+
+	// Size of header
+	static constexpr unsigned int SIZE = sizeof(Type);
+
+	/*
+	* Return the sizeof(...) of a packet 
+	* that is correlated to @type
+	*/
+	static ErrorCode S(Type type, uint16_t &ret);
+
+	template<typename T>
+	static Packet serialize(T& in, Packet::Type type) {
+		if (sizes[(uint16_t)type] == 0) {
+			return { type };
+		}
+		else {
+			Packet packet = { type, new char[sizes[(uint16_t)type]] };
+			std::memcpy(packet.data, (void*)&in, sizeof(T));
+			return packet;
+		}
+	}
+
+	/*
+	* 
+	* Member variables
 	* 	
 	*/
 
@@ -107,6 +135,7 @@ struct Packet {
 
 private:
 	static constexpr size_t sizes[] = {
+		0, // dummy packet
 		sizeof(ConnectionRefused),
 		sizeof(ConnectionVersion),
 		sizeof(ConnectionLogin),

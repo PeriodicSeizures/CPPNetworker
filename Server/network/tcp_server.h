@@ -8,22 +8,25 @@ using namespace asio::ip;
 
 class TCPServer
 {
-private:
+public:
 	// Order of these is apparently important 
-	std::unordered_map<UUID, TCPConnection::pointer> connections;
+	std::unordered_map<UUID, 
+		std::shared_ptr<TCPConnection>> connections;
 
-	asio::io_context _io_context;
-	tcp::acceptor _acceptor;	
+	static std::thread run_thread;
+
+	static asio::io_context _io_context;
+	tcp::acceptor _acceptor;
 
 public:
 	TCPServer(unsigned short port);
-	void send_packet(TCPConnection::pointer client, Packet::Type type, void* data);
+	//void send_packet(std::shared_ptr<TCPConnection> client, Packet::Type type, void* data);
 	//void process_packet(TCPConnection::pointer client, Packet packet);
 
+	void start();
+
 private:
-	void start_accept();
-	void handle_accept(TCPConnection::pointer new_connection,
-		const std::error_code& e);
+	void do_accept();
 
 };
 

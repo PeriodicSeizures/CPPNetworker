@@ -2,26 +2,31 @@
 #define GUIELEMENT_H
 
 #include <string>
+#include <memory>
 #include <SDL.h>
 #include "../engine/Engine.h"
 
 class GUIElement
 {
+public:
+	typedef std::shared_ptr<GUIElement> pointer;
+
 protected:
-	int x, y;
+	int x, y, w, h;
 
 public:
-	GUIElement(int x, int y);
+	GUIElement(int x, int y, int w, int h);
 
 	virtual void on_render();
 	virtual void on_event(SDL_Event& e);
+	bool is_inside(int x, int y);
 };
 
 /*
 * just text
 */
 class GUILabel final : public GUIElement {
-private:
+public:
 	int size;
 	bool centered;
 	std::string text;
@@ -43,7 +48,6 @@ class GUIButton final : public GUIElement {
 private:
 	int size;
 	GUILabel label;
-	int w, h;
 	void (*callback)();
 
 	// backer color
@@ -66,7 +70,9 @@ class GUITextInput final : public GUIElement {
 public:
 	int size;
 	int max_chars;
+	GUILabel label;
 	std::string text;
+	void (*callback)(std::string& s);
 
 	// text color
 	static constexpr SDL_Color color = {
@@ -75,8 +81,9 @@ public:
 
 public:
 	GUITextInput(int x, int y,
-		int size, int max_chars, 
-		std::string text);
+		int size, int label_size, int max_chars,
+		std::string title,
+		void (*callback)(std::string &s));
 
 	void on_render() override;
 	void on_event(SDL_Event& e) override;

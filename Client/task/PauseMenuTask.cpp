@@ -2,6 +2,10 @@
 
 PauseMenuTask PAUSE_MENU_TASK;
 
+PauseMenuTask::PauseMenuTask() {
+
+}
+
 void PauseMenuTask::on_render() {
 
 }

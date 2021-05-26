@@ -4,7 +4,7 @@
 #include <memory>
 #include <thread>
 #include <mutex>
-#include <deque>
+#include <unordered_map>
 #include <optional>
 #include <vector>
 #include <iostream>
@@ -12,24 +12,27 @@
 #include <chrono>
 #include <cstdint>
 
-template<typename T>
-class AsyncQueue
+template<typename K, typename V>
+class AsyncMap
 {
 public:
-	AsyncQueue() = default;
-	AsyncQueue(const AsyncQueue<T>&) = delete;
+	AsyncMap() = default;
+	AsyncMap(const AsyncMap<T>&) = delete;
 	virtual ~AsyncQueue() { clear(); }
 
 public:
 	// Returns and maintains item at front of Queue
-	T& front()
+
+	const V& 
+
+	const T& front()
 	{
 		std::scoped_lock lock(muxQueue);
 		return deqQueue.front();
 	}
 
 	// Returns and maintains item at back of Queue
-	T& back()
+	const T& back()
 	{
 		std::scoped_lock lock(muxQueue);
 		return deqQueue.back();

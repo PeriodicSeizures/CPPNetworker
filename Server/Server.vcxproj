@@ -121,7 +121,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>D:\CPPLibraries\asio-1.18.1\include;$(SolutionDir)Utils;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\libs\asio-1.18.2\include;$(SolutionDir)Utils</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -137,7 +137,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>D:\CPPLibraries\asio-1.18.1\include;$(SolutionDir)Utils;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\libs\asio-1.18.2\include;$(SolutionDir)Utils</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>

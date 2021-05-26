@@ -21,7 +21,7 @@ public:
 
 	tcp::socket& socket();
 
-	void start_reading();
+	void start();
 
 private:
 	TCPConnection(asio::io_context& io_context);

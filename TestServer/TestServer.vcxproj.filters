@@ -15,13 +15,13 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="TestASIOServer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="tcp_server.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="tcp_connection.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ASYNC_TCP_ECHO_SERVER.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

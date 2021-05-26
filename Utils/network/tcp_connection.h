@@ -1,7 +1,6 @@
 #ifndef TCP_CONNECTION_H
 #define TCP_CONNECTION_H
 
-#include <asio.hpp>
 #include <memory>
 #include <deque>
 #include <unordered_map>
@@ -12,6 +11,7 @@
 #define _WIN32_WINNT 0x0A00
 #endif
 #define ASIO_STANDALONE 1
+#include <asio.hpp>
 
 using namespace asio::ip;
 
@@ -19,26 +19,32 @@ class TCPConnection : public std::enable_shared_from_this<TCPConnection>
 {
 private:
 	tcp::socket _socket;
-	Packet::Type in_packet_type;
-	AsyncQueue<Packet> in_packets;
+	//Packet::Type in_packet_type;
+
 	AsyncQueue<Packet> out_packets;
 
 public:
-	typedef std::shared_ptr<TCPConnection> pointer;
+	AsyncQueue<Packet> in_packets;
+	//asio::steady_timer deadline;
 
-	//static void init_io_context(asio::io_context &_io_context);
-	static pointer create(asio::io_context& _io_context);
+	//asio::steady_timer timer_latency;
+	//std::chrono::steady_clock::time_point last, now;
+	//std::chrono::milliseconds prev_latency;
+	//asio::steady_timer timer_out, timer_in;
+
+public:
+	TCPConnection(asio::io_context& _io_context);
+	TCPConnection(tcp::socket socket);
+	~TCPConnection();
 
 	tcp::socket& socket();
 	
 	bool is_connected();
-	void send_packet(Packet &packet);
 
 	/*
-	* Used by server 
-	* Client safe, but there's conect_to_server...
+	* Begin async readers and writers
 	*/
-	void start_reading();
+	void start();
 
 	/*
 	* To connect to server (used by client)
@@ -48,14 +54,21 @@ public:
 		std::string host, 
 		std::string port);
 
+	void send_packet(Packet packet);
+
 private:
-	TCPConnection(asio::io_context& _io_context);
+	
 
 	void read_header();
 	void read_body();
 
 	void write_header();
 	void write_body();
+
+	//void check_time(); // const std::error_code &e
+	//void write_outbeat();
+
+	//void close();
 
 	// packet about 300-400 bytes (512 safe)
 	// 512 bytes is on the larger side for an ordinary tcp tx/rx packet

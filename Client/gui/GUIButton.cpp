@@ -5,9 +5,8 @@ GUIButton::GUIButton(int x, int y,
 	std::string text,
 	int w, int h,
 	void (*callback)())
-	: GUIElement(x, y), 
+	: GUIElement(x, y, w, h), 
 		label(x, y, size, true, text),
-		w(w), h(h),
 		callback(callback) {
 
 }
@@ -30,10 +29,6 @@ void GUIButton::on_event(SDL_Event& e) {
 
 	//SDL_GetMouseState(&mx, &my);
 
-	if (mx < this->x && my < this->y &&
-		mx > this->x + w && my > this->y + h)
-		return;
-
-	if (e.button.button == SDL_BUTTON_LEFT)
+	if (is_inside(mx, my) && e.button.button == SDL_BUTTON_LEFT)
 		callback();
 }
