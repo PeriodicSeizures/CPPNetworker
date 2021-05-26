@@ -15,6 +15,8 @@ TCPConnection::TCPConnection(tcp::socket socket, UUID uuid)
 
 TCPConnection::~TCPConnection() {
 	std::cout << "deconstructor()\n";
+	if (_socket.is_open())
+		_socket.close();
 }
 
 tcp::socket& TCPConnection::socket() {

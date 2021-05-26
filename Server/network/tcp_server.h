@@ -20,6 +20,7 @@ public:
 
 public:
 	TCPServer(unsigned short port);
+	~TCPServer();
 	//void send_packet(std::shared_ptr<TCPConnection> client, Packet::Type type, void* data);
 	//void process_packet(TCPConnection::pointer client, Packet packet);
 

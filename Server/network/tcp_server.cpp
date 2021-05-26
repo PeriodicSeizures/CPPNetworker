@@ -11,6 +11,10 @@ TCPServer::TCPServer(unsigned short port) :
 	//TCPServer::_io_context.run();
 }
 
+TCPServer::~TCPServer() {
+	_io_context.stop();
+}
+
 void TCPServer::start() {
 	TCPServer::run_thread = std::thread(
 		[]() 
@@ -37,6 +41,8 @@ void TCPServer::tick() {
 			continue;
 		}
 
+		const std::shared_ptr<TCPConnection> &conn = it->second;
+
 		while (it->second->in_packets.count() > 1) {
 			auto e = it->second->in_packets.pop_front();
 			uint16_t len = 0;
@@ -46,9 +52,21 @@ void TCPServer::tick() {
 
 			switch (e.type) {
 			case Packet::Type::CHAT32: {
-				Packet::Chat32 chat;
-				std::memcpy(&chat, e.data, len);
-				std::cout << "chat32: " << chat.message << "\n";
+				// instead of copying the contents of the packet data
+				// into the real packet, reinterpret as that type, explicitly
+				Packet::Chat32 *chat = static_cast<Packet::Chat32*>((void*)e.data);
+
+				if (chat->target == '\0') {
+					// message all clients
+					//conn->out_packets.push_back()
+				}
+				else {
+					// message a particular client
+				}
+				std::cout << "chat32: " << chat->message << "\n";
+				break;
+			} case Packet::Type::CHAT64: {
+
 			}
 
 			}

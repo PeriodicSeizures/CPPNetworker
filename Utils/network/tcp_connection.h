@@ -21,10 +21,8 @@ private:
 	tcp::socket _socket;
 	//Packet::Type in_packet_type;
 
-	AsyncQueue<Packet> out_packets;
-	
-
 public:
+	AsyncQueue<Packet> out_packets;
 	AsyncQueue<Packet> in_packets;
 
 	UUID uuid;

@@ -15,18 +15,20 @@
 
 int main()
 {
-	TCPServer server(13);
+	{
+		TCPServer server(13);
 
-	server.start();
+		server.start();
 
-	/*
-	* poll incoming packets on main thread
-	*/
-	while (true) {
-		server.tick();
+		/*
+		* poll incoming packets on main thread
+		*/
+		while (true) {
+			server.tick();
+		}
+
+		TCPServer::run_thread.join();
+
+		return 0;
 	}
-
-	TCPServer::run_thread.join();
-
-	return 0;
 }
