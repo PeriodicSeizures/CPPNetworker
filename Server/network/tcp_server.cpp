@@ -24,6 +24,41 @@ void TCPServer::start() {
 	);
 }
 
+void TCPServer::tick() {
+	for (auto it = connections.cbegin(); it != connections.cend(); ) {
+		//for (auto&& entry : server.connections) {
+
+			/*
+			* it is safe to remove every packet, except for the newest one
+			* the newest packet might be unfinished
+			*/
+		if (!it->second->is_connected()) {
+			it = connections.erase(it);
+			continue;
+		}
+
+		while (it->second->in_packets.count() > 1) {
+			auto e = it->second->in_packets.pop_front();
+			uint16_t len = 0;
+			Packet::ErrorCode ec = Packet::S(e.type, len);
+
+			//if (ec == Packet::ErrorCode::OK) {
+
+			switch (e.type) {
+			case Packet::Type::CHAT32: {
+				Packet::Chat32 chat;
+				std::memcpy(&chat, e.data, len);
+				std::cout << "chat32: " << chat.message << "\n";
+			}
+
+			}
+			//entry.second->in_packets.p
+
+		}
+		++it;
+	}
+}
+
 void TCPServer::do_accept() 
 {
 	//std::hash<std::string> hasher;
@@ -39,8 +74,7 @@ void TCPServer::do_accept()
 			std::hash<std::string> hasher;
 			UUID uuid = hasher(socket.remote_endpoint().address().to_string());
 
-			auto conn = std::make_shared<TCPConnection>(std::move(socket));
-
+			auto conn = std::make_shared<TCPConnection>(std::move(socket), uuid);
 			connections.insert({ uuid, conn });
 
 			conn->start();
@@ -69,3 +103,4 @@ void TCPServer::do_accept()
 	//}
 
 }
+

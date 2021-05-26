@@ -94,13 +94,25 @@ public:
 		deqQueue.clear();
 	}
 
-	void wait()
+	bool wait()
 	{
 		while (empty())
 		{
 			std::unique_lock<std::mutex> ul(muxBlocking);
 			cvBlocking.wait(ul);
+			if (notified) {
+				notified = false;
+				return true;
+			}
 		}
+		return false;
+	}
+
+	void notify()
+	{
+		std::unique_lock<std::mutex> ul(muxBlocking);
+		notified = true;
+		cvBlocking.notify_one();
 	}
 
 protected:
@@ -108,6 +120,8 @@ protected:
 	std::deque<T> deqQueue;
 	std::condition_variable cvBlocking;
 	std::mutex muxBlocking;
+
+	bool notified = false;
 };
 
 #endif

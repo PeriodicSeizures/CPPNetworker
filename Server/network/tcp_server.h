@@ -25,6 +25,8 @@ public:
 
 	void start();
 
+	void tick();
+
 private:
 	void do_accept();
 

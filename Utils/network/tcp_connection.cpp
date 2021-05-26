@@ -10,8 +10,8 @@ TCPConnection::TCPConnection(asio::io_context& _io_context)
 	: _socket(_io_context) {}
 
 // used by server
-TCPConnection::TCPConnection(tcp::socket socket)
-	: _socket(std::move(socket)) {}
+TCPConnection::TCPConnection(tcp::socket socket, UUID uuid)
+	: _socket(std::move(socket)), uuid(uuid) {}
 
 TCPConnection::~TCPConnection() {
 	std::cout << "deconstructor()\n";
@@ -22,9 +22,7 @@ tcp::socket& TCPConnection::socket() {
 }
 
 void TCPConnection::start() {
-	//out_packets.push_back({ Packet::Type::DUMMY, nullptr });
 	read_header();
-	//write_header();
 	auto self(shared_from_this());
 	asio::post([this, self]() {write_header(); });
 }
@@ -60,6 +58,9 @@ void TCPConnection::read_header() {
 		}
 		else {
 			std::cout << "read header error: " << e.message() << "\n";
+			//out_packets.clear();
+			out_packets.notify();
+			_socket.close();
 		}
 	}
 	);
@@ -91,6 +92,8 @@ void TCPConnection::read_body() {
 			}
 			else {
 				std::cout << "read body error: " << e.message() << "\n";
+				//out_packets.clear();
+				out_packets.notify();
 			}
 		}
 		);
@@ -106,7 +109,11 @@ void TCPConnection::read_body() {
 void TCPConnection::write_header() {
 
 	// will always check whether the container is empty
-	out_packets.wait();
+	bool was_notified = out_packets.wait();
+
+	if (was_notified)
+		return;
+
 	std::cout << "write_header()\n";
 
 	auto self(shared_from_this());
