@@ -8,6 +8,13 @@
 #endif
 
 #include "Engine.h"
+#include "rapidjson/document.h"
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
+#include "rapidjson/filereadstream.h"
+#include <iostream>
+
+using namespace rapidjson;
 
 static SDL_Window* sdl_window;
 static SDL_Renderer* sdl_renderer;
@@ -18,7 +25,7 @@ static SDL_Texture* font;
 
 
 
-void drawChar(char c, int x, int y, const SDL_Color &color, uint8_t size) {
+inline void drawChar(char c, int x, int y, const SDL_Color &color, uint8_t size) {
     if (c >= 32 && c <= 126) {
         int offset = (int)(c - 32) * 7;
 
@@ -39,6 +46,7 @@ void drawChar(char c, int x, int y, const SDL_Color &color, uint8_t size) {
 }
 
 namespace Engine {
+
     SDL_Texture* loadTexture(std::string path)
     {
         //The final texture
@@ -89,6 +97,8 @@ namespace Engine {
         
         font = loadTexture("resources/font7x11.png");
 
+        //sprite_sheet = Engine::loadTexture("resources/ant.png");
+
 #ifndef _WIN32
         signal(SIGINT, SIG_DFL);
 #endif
@@ -98,6 +108,8 @@ namespace Engine {
 	}
 
     void uninit() {
+        //SDL_DestroyTexture(sprite_sheet);
+
         //Free loaded image
         SDL_DestroyTexture(font);
 
@@ -215,13 +227,93 @@ namespace Engine {
         
     }
 
-    void fill(const SDL_Color &color) {
-        SDL_SetRenderDrawColor(sdl_renderer, color.r, color.g, color.b, color.a);
+    void fill(const SDL_Color &c) {
+        SDL_SetRenderDrawColor(sdl_renderer, c.r, c.g, c.b, c.a);
         SDL_RenderFillRect(sdl_renderer, NULL);
     }
 
-    void fillRect(const SDL_Color& color, const SDL_Rect& rect) {
-        SDL_RenderFillRect(sdl_renderer, &rect);
+    float CAMERA_X = 0, CAMERA_Y = 0;
+    float CAMERA_SCALE = 2;
+
+    //SDL_Texture* sprite_sheet;
+
+    //Sprite::Sprite(float x, float y,
+    //    uint8_t sheet_x, uint8_t sheet_y,
+    //    uint8_t frame_count)
+    //    : x(x), y(y),
+    //    vx(0), vy(0),
+    //    sheet_x(sheet_x), sheet_y(sheet_y),
+    //    sheet_w(16), sheet_h(16),
+    //    frame_count(frame_count),
+    //    frame_time(1000) { }
+
+
+
+    Sprite::Sprite(std::string filename) {
+        FILE* f = fopen(filename.c_str(), "rb");
+
+        if (!f) {
+            std::cout << filename << " was not found\n";
+            return;
+        }
+
+        //printf("parsing tiles.json\n");
+
+        char readBuffer[65536];
+        FileReadStream is(f, readBuffer, sizeof(readBuffer));
+
+        Document d;
+        d.ParseStream(is);
+
+        fclose(f);
+
+        // relative paths simplicity
+        sprite_sheet = loadTexture(std::string("resources/") + d["filename"].GetString());
+        w = d["width"].GetUint();
+        h = d["height"].GetUint();
+
+        const Value& V_anim = d["animations"];
+
+        for (Value::ConstValueIterator itr = V_anim.Begin(); itr != V_anim.End(); ++itr) {
+            //std::string name = (*itr)["id"].GetString();
+
+            std::vector<uint16_t> durations;
+
+            uint16_t frame_x = static_cast<uint16_t>((*itr)["x"].GetUint());
+            uint16_t frame_y = static_cast<uint16_t>((*itr)["y"].GetUint());
+
+            for (auto& item : (*itr)["durations"].GetArray()) {
+                durations.push_back(item.GetUint());
+            }
+            
+            animations.push_back({ frame_x, frame_y, durations });
+        }
+
+    }
+
+    //Sprite::Sprite(float x, float y,
+    //    uint8_t current_frame)
+    //    : x(x), y(y),
+    //    vx(0), vy(0),
+    //    frame_x(frame_x), frame_y(frame_y),
+    //    frame_w(frame_w), frame_h(frame_h),
+    //    current_frame(0), current_time(0) { }
+    //
+    void Sprite::draw(float x, float y, uint8_t cur_frame, uint8_t cur_anim) {
+        Animation& anim = animations[cur_anim];
+
+        SDL_Rect srcrect = { anim.frame_x + cur_frame * w, 
+            anim.frame_y, w, h };
+
+
+        unsigned int scale_h_off = (float)w * CAMERA_SCALE * 0.5f;
+        unsigned int scale_v_off = (float)h * CAMERA_SCALE * 0.5f;
+
+        SDL_Rect dstrect = { CAMERA_X + x - scale_h_off,
+            CAMERA_Y - y - scale_v_off,
+            (float)w * CAMERA_SCALE, (float)h * CAMERA_SCALE };
+
+        Engine::drawTexture(sprite_sheet, srcrect, dstrect);
     }
 
 }

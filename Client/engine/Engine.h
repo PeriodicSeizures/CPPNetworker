@@ -1,6 +1,7 @@
 #pragma once
 #include <SDL.h>
 #include <string>
+#include <vector>
 namespace Engine {
 
 	SDL_Texture* loadTexture(std::string path);
@@ -23,5 +24,33 @@ namespace Engine {
 
 	void fill(const SDL_Color& color);
 
-	void fillRect(const SDL_Color& color, const SDL_Rect& rect);
+	extern float CAMERA_X, CAMERA_Y;
+	extern float CAMERA_SCALE;
+
+	//extern SDL_Texture* sprite_sheet;
+
+	struct Animation {
+
+		const uint16_t frame_x, frame_y; // topleft begin
+		std::vector<uint16_t> durations; // constlike
+
+	};
+
+	class Sprite final {
+	public:
+		std::vector<Animation> animations; // a sprite might have different animations
+
+	private:
+
+		uint16_t w, h; // size of the sprite
+		SDL_Texture* sprite_sheet;
+
+	public:
+		Sprite(std::string filename);
+
+		void draw(float x, float y, uint8_t cur_frame, uint8_t cur_anim);
+
+	};
+
+	//void drawSprite(Sprite* sprite, float x, float y);
 }
