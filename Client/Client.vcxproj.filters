@@ -21,12 +21,6 @@
     <ClCompile Include="engine\Engine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="engine\SpriteEngine.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="sprite\Player.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="task\Task.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -57,21 +51,24 @@
     <ClCompile Include="task\CommandTask.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="entity\Entity.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="entity\Player.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="engine\Engine.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\SpriteEngine.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="sprite\Player.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="task\Task.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="gui\GUIElement.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="entity\Entity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

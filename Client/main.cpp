@@ -5,60 +5,27 @@
 #include <string>
 #include "task/Task.h"
 #include "engine/Engine.h"
-#include "engine/SpriteEngine.h"
-#include "sprite/Player.h"
-#include "network/tcp_connection.h"
-
-//void HANDLER_CALLBACK(const std::error_code&) {
-//	std::cout << "callback!\n";
-//}
+#include "entity/Entity.h"
 
 int main(void)
 {
-	//asio::io_context io;
-	//asio::steady_timer t(io, asio::chrono::seconds(5));
-	//t.async_wait(&HANDLER_CALLBACK);
-	//io.run();
-	//return 0;
-	//
-
-
-
 	Engine::init();
-	SpriteEngine::init();
-
 	Task::init();
 
-	MAIN_MENU_TASK.focus();
-
-	try {
-
-		//Task::connection->connect_to_server(io_context, 
-		//	SERVER, 
-		//	std::to_string(PORT));
-		//
-		//io_context.run();
-	}
-	catch (std::exception& e)
-	{
-		std::cout << "error: " << e.what() << "\n";
-	}
-
-	Player player;
+	//MAIN_MENU_TASK.focus();
+	WORLD_TASK.focus();
 
 	bool alive = true;
 	bool render = true;
 	while (alive) {
-		// can experiment this to decrease cpu usage
-		// still seems pretty responsive, and much less cpu usage
-		// however might screw with timings in the long run, so yea...
-		// test things out
+
+		// event polling thousands of times per second is
+		// unnecessary and drastically increases cpu usage
 		std::this_thread::sleep_for(std::chrono::milliseconds(10));
 		SDL_Event e;
 		while (SDL_PollEvent(&e))
 		{
 			Task::current_task->on_event(e);
-			//bool chatting = crzi::NetworkingGame::instance->input_text_handler.processInput(e);
 
 			switch (e.type)
 			{
@@ -86,118 +53,19 @@ int main(void)
 			
 		}
 
-		// must put all rendering in here or gpu will fall behind on rendering
-		// when frames are dispatched due to all the queued frames
+		// only render on mouse focus
 		if (render) {
 			Engine::fill({0, 0, 0, 255});
 
-			//crzi::NetworkingGame::instance->input_text_handler.render();
-
-			player.render();
-
+			//player.onRender();
 			Task::current_task->on_render();
 
 			Engine::doRender();
 		}
-		//Sleep(1000);
-
-		//Engine::
 	}
-
-	//SDL_StopTextInput();
-
-	//GlobalContainer::tcp_client.close();
-
-	SpriteEngine::uninit();
-	Engine::uninit();
 
 	Task::uninit();
+	Engine::uninit();
 
 	return 0;
-
-
-	/*
-		udp stuff
-		*/
-
-	/*
-	struct sockaddr_in si_other;
-	int s, slen = sizeof(si_other);
-	char buf[BUFLEN];
-	char message[BUFLEN];
-	//WSADATA wsa;
-
-	//Initialise winsock
-	printf("\nInitialising Winsock...");
-	if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
-	{
-		printf("Failed. Error Code : %d", WSAGetLastError());
-		exit(EXIT_FAILURE);
-	}
-	printf("Initialised.\n");
-
-	//create socket
-	if ((s = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) == SOCKET_ERROR)
-	{
-		printf("socket() failed with error code : %d", WSAGetLastError());
-		exit(EXIT_FAILURE);
-	}
-
-	//setup address structure
-	memset((char*)&si_other, 0, sizeof(si_other));
-	si_other.sin_family = AF_INET;
-	si_other.sin_port = htons(PORT);
-//	si_other.sin_addr.S_un.S_addr = inet_addr(SERVER);
-	// turns the string ip into a numeric ip
-	InetPton(AF_INET, _T(SERVER), &si_other.sin_addr.S_un.S_addr);
-
-	//start communication
-	while (1)
-	{
-		printf("Enter message : ");
-
-		std::cin >> message;
-		message[0] = 0x1B; // -128;
-		message[1] = 0x39;
-
-		//message[0] = 0x40;
-		//message[1] = 0x49;
-		//message[2] = 0x0f;
-		//message[3] = 0xdb;
-
-		message[0] = (0x0);
-		message[1] = (0x0); // chat packet
-
-
-
-
-
-
-
-
-		//send the message
-		if (sendto(s, message, 8, 0, (struct sockaddr*)&si_other, slen) == SOCKET_ERROR)
-		{
-			printf("sendto() failed with error code : %d", WSAGetLastError());
-			exit(EXIT_FAILURE);
-		}
-
-		//receive a reply and print it
-		//clear the buffer by filling null, it might have previously received data
-		memset(buf, '\0', BUFLEN);
-		//try to receive some data, this is a blocking call
-		if (recvfrom(s, buf, BUFLEN, 0, (struct sockaddr*)&si_other, &slen) == SOCKET_ERROR)
-		{
-			printf("recvfrom() failed with error code : %d", WSAGetLastError());
-			exit(EXIT_FAILURE);
-		}
-
-		puts(buf);
-	}
-
-	closesocket(s);
-	WSACleanup();
-
-	return 0;
-	*/
 }

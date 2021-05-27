@@ -5,6 +5,7 @@
 #include <SDL.h>
 #include "network/tcp_connection.h"
 #include "../gui/GUIElement.h"
+#include "../entity/Entity.h"
 
 class Task {
 
@@ -14,7 +15,7 @@ public:
 	virtual void on_event(SDL_Event &e) = 0;
 
 	/*
-	* shared across tasks
+	* shared variables for tasks
 	*/
 	static Task* current_task;
 	static Task* prev_task;
@@ -25,6 +26,12 @@ public:
 	static std::condition_variable cv_run;
 	static std::mutex mux_run;
 	static bool running;
+
+	/*
+	* in game variables
+	*/
+
+	static Player *player;
 
 	/*
 	* Settings

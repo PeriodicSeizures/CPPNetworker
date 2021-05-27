@@ -8,7 +8,7 @@ WorldTask::WorldTask() {
 
 void WorldTask::on_render() {
 	// draw entities and world
-
+	player->onRender();
 }
 
 void WorldTask::on_tick() {

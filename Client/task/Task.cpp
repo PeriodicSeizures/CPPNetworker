@@ -14,6 +14,8 @@ std::condition_variable Task::cv_run;
 std::mutex Task::mux_run;
 bool Task::running = true;
 
+Player* Task::player; // (400, -300);
+
 bool Task::DEBUG;
 
 void Task::focus() {
@@ -38,6 +40,9 @@ void Task::init() {
 			Task::_io_context.restart(); // this will only run if the io_context is stopped
 		}
 	});
+
+	//player = new Player(400, -300);
+	player = new Player(400, -300);
 }
 
 void Task::uninit() {

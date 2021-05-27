@@ -15,7 +15,7 @@ void GUIButton::on_render() {
 
 	// w as size, and h as centered (reuse)
 	SDL_Rect rect = {x, y, w, h};
-	Engine::fillRect(color, rect);
+	//Engine::fillRect(color, rect);
 
 	label.on_render();
 }
