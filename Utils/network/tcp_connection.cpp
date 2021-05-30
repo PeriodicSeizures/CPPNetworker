@@ -34,12 +34,19 @@ bool TCPConnection::is_connected() {
 }
 
 void TCPConnection::connect_to_server(asio::io_context& _io_context, std::string host, std::string port) {
+
+	std::cout << "attempting to connect to host: " << host << ", port: " << port << "\n";
+
 	tcp::resolver resolver(_io_context);
 	auto endpoints = resolver.resolve(tcp::v4(), host, port);
 
 	asio::async_connect(_socket, endpoints,
 		std::bind(&TCPConnection::start, this));
 }
+
+//void TCPConnection::dispatch(Packet packet) {
+//	out_packets.push_back(std::move(packet));
+//}
 
 void TCPConnection::read_header() {
 	in_packets.push_back({ Packet::Type::count, nullptr }); // push an empty packet for preparation
@@ -167,6 +174,6 @@ void TCPConnection::write_body() {
 	}
 }
 
-void TCPConnection::send_packet(Packet packet) {
-	out_packets.push_back(packet);
-}
+//void TCPConnection::send_packet(Packet packet) {
+//	out_packets.push_back(packet);
+//}

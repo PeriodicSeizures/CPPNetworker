@@ -41,7 +41,7 @@ void TCPServer::tick() {
 			continue;
 		}
 
-		const std::shared_ptr<TCPConnection> &conn = it->second;
+		auto conn = it->second;
 
 		while (it->second->in_packets.count() > 1) {
 			auto e = it->second->in_packets.pop_front();
@@ -50,13 +50,19 @@ void TCPServer::tick() {
 
 			//if (ec == Packet::ErrorCode::OK) {
 
+
+
 			switch (e.type) {
+			case Packet::Type::SRC_CLIENT_TRUSTED_MOTION: {
+				this->dispatch_except(e, conn->uuid);
+				break;
+			}
 			case Packet::Type::CHAT32: {
 				// instead of copying the contents of the packet data
 				// into the real packet, reinterpret as that type, explicitly
 				Packet::Chat32 *chat = static_cast<Packet::Chat32*>((void*)e.data);
 
-				if (chat->target == '\0') {
+				if (chat->target[0] == '\0') {
 					// message all clients
 					//conn->out_packets.push_back()
 				}
@@ -77,6 +83,24 @@ void TCPServer::tick() {
 	}
 }
 
+
+void TCPServer::forward(Packet packet) {
+	for (auto&& conn : connections) {
+		conn.second->out_packets.push_back(std::move(packet));
+	}
+}
+
+void TCPServer::forward(Packet packet, UUID uuid) {
+	connections[uuid]->out_packets.push_back(std::move(packet));
+}
+
+void TCPServer::forward_except(Packet packet, UUID uuid) {
+	for (auto&& conn : connections) {
+		if (conn.first != uuid)
+			conn.second->out_packets.push_back(std::move(packet));
+	}
+}
+
 void TCPServer::do_accept() 
 {
 	//std::hash<std::string> hasher;
@@ -87,15 +111,32 @@ void TCPServer::do_accept()
 	{
 		if (!ec)
 		{
-			std::cout << "connect\n";
+			try {
+				asio::ip::tcp::endpoint endpoint = socket.remote_endpoint();
 
-			std::hash<std::string> hasher;
-			UUID uuid = hasher(socket.remote_endpoint().address().to_string());
+				std::string addr = endpoint.address().to_string();
+				uint16_t port = endpoint.port();
 
-			auto conn = std::make_shared<TCPConnection>(std::move(socket), uuid);
-			connections.insert({ uuid, conn });
+				std::hash<std::string> hasher;
+				UUID uuid = hasher(addr + std::to_string(port));
 
-			conn->start();
+				
+
+				auto conn = std::make_shared<TCPConnection>(std::move(socket), uuid);
+
+
+				// when here it works, not sure tho ...
+				// port = ...
+
+				std::cout << "client " << uuid << " has connected from: " << 
+					addr << ", port: " << port << "\n";
+
+				connections.insert({ uuid, conn });
+				conn->start();
+			}
+			catch (const std::system_error& ec) {
+				std::cout << "error in connect: " << ec.what() << "\n";
+			}
 
 			//asio::steady_timer timer(_io_context);
 			//timer.expires_after(std::chrono::seconds(5));

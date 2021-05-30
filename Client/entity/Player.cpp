@@ -1,38 +1,44 @@
 #include "Entity.h"
+#include "network/Packet.h"
+#include "../task/Task.h"
 
-Player::Player(float x, float y) : Entity(x, y, "resources/ant.json") {	
-	halo = Engine::loadTexture("resources/halo.png");
+Player::Player(float x, float y) : Entity(x, y, "resources/ant.json"), 
+vignette_sprite("resources/vig.png") {	
+	//halo = Engine::loadTexture("resources/halo.png");
+	//vignette_sprite = Engine::loadTexture("resources/vig.png");
 }
 
 Player::~Player() {
-	SDL_DestroyTexture(halo);
+	//SDL_DestroyTexture(halo);
+	//SDL_DestroyTexture(vignette);
 }
 
 void Player::on_render() { 
 	// render my own halo, then render normallyish
 
-	SDL_Rect srcrect = { 0, 0, 64, 64 };
-	//SDL_Rect dstrect = { Engine::CAMERA_X + x - 32 - (32.0f * Engine::CAMERA_SCALE) / 2.0f,
-	//	Engine::CAMERA_Y - y - 32 - (32.0f * Engine::CAMERA_SCALE) / 2.0f,
+	//SDL_Rect srcrect = { 0, 0, 64, 64 };
+	//SDL_Rect dstrect = { 
+	//	x - 32*Engine::CAMERA_SCALE,
+	//	-y - 32*Engine::CAMERA_SCALE,
 	//	64.0f * Engine::CAMERA_SCALE, 64.0f * Engine::CAMERA_SCALE };
-
-	SDL_Rect dstrect = { 
-		x - 32*Engine::CAMERA_SCALE,
-		-y - 32*Engine::CAMERA_SCALE,
-		64.0f * Engine::CAMERA_SCALE, 64.0f * Engine::CAMERA_SCALE };
 	
-	Engine::drawTexture(halo, srcrect, dstrect);
+	//Engine::drawTexture(halo, srcrect, dstrect);
+	// 
+	//SDL_Color black = {0, 0, 0, 255};
+	//Engine::drawTexture(black, dstrect.x, dstrect.y, dstrect.w, dstrect.h);
+
+	vignette_sprite.draw(x, y, 0);
 
 	Entity::on_render();
 }
 
-static constexpr uint8_t UP_MASK =		0x1;
-static constexpr uint8_t RIGHT_MASK =	0x01;
-static constexpr uint8_t DOWN_MASK =	0x001;
-static constexpr uint8_t LEFT_MASK =	0x0001;
+static constexpr uint8_t UP_MASK =		0b0001;
+static constexpr uint8_t RIGHT_MASK =	0b0010;
+static constexpr uint8_t DOWN_MASK =	0b0100;
+static constexpr uint8_t LEFT_MASK =	0b1000;
 
 static constexpr double ANGLES[] = {
-	0, 90, 45, 0, -45, -90, -135, -180, -225
+	-999, 90, 0, 45, -90, -999, -45, -999, -180, 135, -999, -999, -135
 };
 
 void Player::on_update(float delta) {
@@ -73,14 +79,45 @@ void Player::on_update(float delta) {
 		this->ax = 0;
 	}
 
-	double new_angle = 360 - ANGLES[mask];
+	if (do_animate && Task::connection) {
+		// send packets
+		Packet::TrustedMotion packet = { x, y, vx, vy, ax, ay };
+		
+		Task::connection->dispatch(std::move(packet));
+	}
 
-	double ac = (angle - new_angle) * delta;
-	angle += ac;
+	//angle = 360 - ANGLES[mask] + 90;
 
-	angle = fmod(angle, 360);
-	if (angle < 0)
-		angle += 360;
+	auto new_angle = ANGLES[mask];
+
+	if (new_angle != -999) {
+		// then try turning
+		new_angle = 360 - new_angle + 90;
+		angle = new_angle;
+		//auto diff = new_angle - angle;
+		//auto change = diff * delta;
+		//if (fabs(change) < .01)
+		//	change = .01;
+		////if (change > .005 && change < .5)
+		//	//change = .05;
+		////if (fabs(diff) < 180)
+		//	//change *= -1;
+		//angle += change;
+	}
+
+	//angle = fmod(angle, 360);
+	//if (angle < 0)
+	//	angle += 360;
+		
+
+	//double new_angle = 360 - ANGLES[mask];
+	//
+	//double ac = (angle - new_angle) * delta;
+	//angle += ac;
+	//
+	//angle = fmod(angle, 360);
+	//if (angle < 0)
+	//	angle += 360;
 
 	Entity::on_update(delta);
 }

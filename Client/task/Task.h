@@ -54,6 +54,10 @@ public:
 	void on_update(float delta) override;
 	void on_event(SDL_Event& e) override;
 
+	void do_listen();
+
+	Player* other;
+
 	//Engine::Sprite *brick_sprite;
 };
 

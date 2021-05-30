@@ -83,7 +83,9 @@ struct Packet {
 		static constexpr Packet::Type type = Packet::Type::SRC_CLIENT_TRUSTED_MOTION;
 		float x, y;
 		float vx, vy;
-		Direction dir;
+		float ax, ay;
+		//Direction dir;
+		UUID source;
 	};
 
 	// fuck the clients motion
@@ -112,16 +114,21 @@ struct Packet {
 	*/
 	static ErrorCode S(Type type, uint16_t &ret);
 
+	//template<typename T>
+	//static Packet serialize(T& in, Packet::Type type) {
+	//	if (sizes[(uint16_t)type] == 0) {
+	//		return { type };
+	//	}
+	//	else {
+	//		Packet packet = { type, new char[sizes[(uint16_t)type]] };
+	//		std::memcpy(packet.data, (void*)&in, sizeof(T));
+	//		return packet;
+	//	}
+	//}
+
 	template<typename T>
-	static Packet serialize(T& in, Packet::Type type) {
-		if (sizes[(uint16_t)type] == 0) {
-			return { type };
-		}
-		else {
-			Packet packet = { type, new char[sizes[(uint16_t)type]] };
-			std::memcpy(packet.data, (void*)&in, sizeof(T));
-			return packet;
-		}
+	static T* deserialize(Packet& in) {
+		return static_cast<T*>((void*)in.data);
 	}
 
 	/*
@@ -133,7 +140,7 @@ struct Packet {
 	Type type;
 	char* data;
 
-private:
+//private:
 	static constexpr size_t sizes[] = {
 		0, // dummy packet
 		sizeof(ConnectionRefused),

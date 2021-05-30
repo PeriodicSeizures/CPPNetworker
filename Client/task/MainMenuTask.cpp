@@ -12,16 +12,21 @@ MainMenuTask::MainMenuTask() {
 			std::string ip = s.substr(0, at);
 			std::string port = s.substr(at + 1);
 
-			std::cout << "connect callback() to ip: " << ip << ", port: " << port << "\n";
-
 			if (Task::do_stops) {
 				Task::_io_context.stop();
 			}
 
-			Task::connection->connect_to_server(Task::_io_context, ip, port);
+			try {
+				Task::connection->connect_to_server(Task::_io_context, ip, port);
+				Task::cv_run.notify_one();
+				Task::do_stops = true;
 
-			Task::cv_run.notify_one();
-			Task::do_stops = true;
+				WORLD_TASK.focus();
+			}
+			catch (const std::system_error& ec) {
+				std::cout << "connect error: " << ec.what() << "\n";
+			}
+
 		}
 	);
 
@@ -36,22 +41,22 @@ MainMenuTask::MainMenuTask() {
 			if (s.length() < 32) {
 				Packet::Chat32 chat;
 				std::memcpy(chat.message, s.c_str(), s.length() + 1);
-				Task::connection->send_packet(Packet::serialize(chat, chat.type));
+				Task::connection->dispatch(std::move(chat));
 			}
 			else if (s.length() < 64) {
 				Packet::Chat64 chat;
 				std::memcpy(chat.message, s.c_str(), s.length() + 1);
-				Task::connection->send_packet(Packet::serialize(chat, chat.type));
+				Task::connection->dispatch(std::move(chat));
 			}
 			else if (s.length() < 128) {
 				Packet::Chat128 chat;
 				std::memcpy(chat.message, s.c_str(), s.length() + 1);
-				Task::connection->send_packet(Packet::serialize(chat, chat.type));
+				Task::connection->dispatch(std::move(chat));
 			}
 			else if (s.length() < 256) {
 				Packet::Chat256 chat;
 				std::memcpy(chat.message, s.c_str(), s.length() + 1);
-				Task::connection->send_packet(Packet::serialize(chat, chat.type));
+				Task::connection->dispatch(std::move(chat));
 			}
 			s.clear();
 		}

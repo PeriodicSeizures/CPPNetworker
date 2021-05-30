@@ -11,8 +11,8 @@ int main(void)
 	Engine::init();
 	Task::init();
 
-	//MAIN_MENU_TASK.focus();
-	WORLD_TASK.focus();
+	MAIN_MENU_TASK.focus();
+	//WORLD_TASK.focus();
 
 	//std::chrono::
 

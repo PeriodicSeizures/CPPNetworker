@@ -29,6 +29,8 @@ namespace Engine {
 
 	void fill(const SDL_Color& color);
 
+	void fillRect(const SDL_Color& c, int x, int y, int w, int h);
+
 	extern float CAMERA_X, CAMERA_Y;
 	extern float CAMERA_SCALE;
 
@@ -53,6 +55,7 @@ namespace Engine {
 	public:
 		Sprite(std::string filename);
 
+		void draw(float x, float y, double angle);
 		void draw(float x, float y, double angle, uint8_t cur_frame, uint8_t cur_anim);
 
 	};

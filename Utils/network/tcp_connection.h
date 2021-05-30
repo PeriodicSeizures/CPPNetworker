@@ -55,7 +55,23 @@ public:
 		std::string host, 
 		std::string port);
 
-	void send_packet(Packet packet);
+	//void send_packet(Packet packet);
+
+	template<class T>
+	void dispatch(T packet) {
+		auto size = sizeof(T); // Packet::sizes[(uint16_t)packet.type];
+		if (size) {
+			Packet __packet = { packet.type, new char[size] };
+			std::memcpy(__packet.data, (void*)&packet, size);
+			out_packets.push_back(std::move(__packet));
+		}
+		else {
+			out_packets.push_back({ packet.type });
+		}
+	}
+
+	// send raw packet
+	//void dispatch(Packet packet);
 
 private:
 	

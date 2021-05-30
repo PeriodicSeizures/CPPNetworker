@@ -1,7 +1,7 @@
 #pragma once
 #include "../engine/Engine.h"
 class Entity {
-protected:
+public:
 	float x, y;		// position
 	float vx, vy;	// velocity
 	float ax, ay;	// acceleration
@@ -32,7 +32,8 @@ public:
 
 class Player : public Entity {
 private:
-	SDL_Texture* halo;
+	//SDL_Texture* halo;
+	Engine::Sprite vignette_sprite;
 
 public:
 	Player(float x, float y);

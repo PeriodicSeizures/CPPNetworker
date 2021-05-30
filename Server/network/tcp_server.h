@@ -28,6 +28,33 @@ public:
 
 	void tick();
 
+	/*
+	* to send a constructed struct
+	*/
+	template<class T>
+	void dispatch(T packet) {
+		for (auto&& conn : connections) {
+			conn.second->dispatch(packet);
+		}
+	}
+
+	template<class T>
+	void dispatch(T packet, UUID uuid) {
+		connections[uuid]->dispatch(packet);
+	}
+
+	template<class T>
+	void dispatch_except(T packet, UUID uuid) {
+		for (auto&& conn : connections) {
+			if (conn.first != uuid)
+				conn.second->dispatch(packet);
+		}
+	}
+
+	void forward(Packet packet);
+	void forward(Packet, UUID uuid);
+	void forward_except(Packet packet, UUID uuid);
+
 private:
 	void do_accept();
 

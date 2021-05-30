@@ -258,6 +258,12 @@ namespace Engine {
         SDL_RenderFillRect(sdl_renderer, NULL);
     }
 
+    void fillRect(const SDL_Color& c, int x, int y, int w, int h) {
+        SDL_Rect rect = { x, y, w, h };
+        SDL_SetRenderDrawColor(sdl_renderer, c.r, c.g, c.b, c.a);
+        SDL_RenderFillRect(sdl_renderer, &rect);
+    }
+
     float CAMERA_X = 0, CAMERA_Y = 0;
     float CAMERA_SCALE = 2;
 
@@ -273,13 +279,31 @@ namespace Engine {
     //    frame_count(frame_count),
     //    frame_time(1000) { }
 
-
+    bool ends_with(std::string const& fullString, std::string const& ending) {
+        if (fullString.length() >= ending.length()) {
+            return (0 == fullString.compare(fullString.length() - ending.length(), ending.length(), ending));
+        }
+        else {
+            return false;
+        }
+    }
 
     Sprite::Sprite(std::string filename) {
         FILE* f = fopen(filename.c_str(), "rb");
 
         if (!f) {
             std::cout << filename << " was not found\n";
+            return;
+        }
+
+        if (!ends_with(filename, ".json")) {
+            // load png directly
+            sprite_sheet = loadTexture(filename.c_str());
+            //SDL_Point pt;
+            int _w, _h;
+            SDL_QueryTexture(sprite_sheet, NULL, NULL, &_w, &_h);
+            w = _h;
+            h = _h;
             return;
         }
 
@@ -325,7 +349,23 @@ namespace Engine {
     //    frame_w(frame_w), frame_h(frame_h),
     //    current_frame(0), current_time(0) { }
     //
+
+    void Sprite::draw(float x, float y, double angle) {
+
+        SDL_Rect srcrect = { 0, 0, w, h };
+
+        unsigned int scale_h_off = (float)w * CAMERA_SCALE * 0.5f;
+        unsigned int scale_v_off = (float)h * CAMERA_SCALE * 0.5f;
+
+        SDL_Rect dstrect = { CAMERA_X + x - scale_h_off,
+            CAMERA_Y - y - scale_v_off,
+            (float)w * CAMERA_SCALE, (float)h * CAMERA_SCALE };
+
+        Engine::drawTexture(sprite_sheet, srcrect, dstrect, angle);
+    }
+
     void Sprite::draw(float x, float y, double angle, uint8_t cur_frame, uint8_t cur_anim) {
+
         Animation& anim = animations[cur_anim];
 
         SDL_Rect srcrect = { anim.frame_x + cur_frame * w, 
