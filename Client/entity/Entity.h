@@ -2,8 +2,14 @@
 #include "../engine/Engine.h"
 class Entity {
 protected:
-	float x, y;
-	float vx, vy;
+	float x, y;		// position
+	float vx, vy;	// velocity
+	float ax, ay;	// acceleration
+
+	float terminal_v = 150.f;
+	float fric = 4.f;
+	bool do_animate = true;
+	double angle = 0;
 
 	Engine::Sprite sprite;
 	uint8_t cur_frame; // the frame index of the current animation
@@ -14,11 +20,17 @@ public:
 	Entity(float x, float y, std::string json_filename);
 
 public:
-	//virtual void onTick() = 0;
-	virtual void onRender();
+	virtual void on_render();
+	virtual void on_update(float delta);
 };
 
-class Player : Entity {
+// shared by server and client
+//class SharedEntity {
+//private:
+//
+//};
+
+class Player : public Entity {
 private:
 	SDL_Texture* halo;
 
@@ -26,6 +38,8 @@ public:
 	Player(float x, float y);
 	~Player();
 
-	//void onTick() override;
-	void onRender() override;
+	void on_render() override;
+	void on_update(float delta) override;
+
+	//void onEvent(SDL_Event& e);
 };

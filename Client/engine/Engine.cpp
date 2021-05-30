@@ -125,9 +125,35 @@ namespace Engine {
         SDL_RenderPresent(sdl_renderer);
     }
 
-    void drawTexture(SDL_Texture* texture, SDL_Rect &src_rect, SDL_Rect &rect) {
+    void drawTexture(SDL_Texture* texture, 
+        SDL_Rect &src_rect, SDL_Rect &rect) {
         SDL_RenderCopy(sdl_renderer, texture, &src_rect, &rect);
     }
+
+    void drawTexture(SDL_Texture* texture,
+        SDL_Rect& src_rect, SDL_Rect& rect, double angle) {
+        SDL_RenderCopyEx(sdl_renderer, texture, &src_rect, &rect, angle, NULL, SDL_RendererFlip::SDL_FLIP_NONE);
+    }
+
+    //void drawSprite(SDL_Texture* texture, float x, float y, SDL_Rect& src_rect) {
+    //    //SDL_RenderCopy(sdl_renderer, texture, &src_rect, &rect);
+    //
+    //    //Animation& anim = animations[cur_anim];
+    //
+    //    //SDL_Rect srcrect = { anim.frame_x + cur_frame * w,
+    //    //    anim.frame_y, w, h };
+    //
+    //
+    //    unsigned int scale_h_off = (float)src_rect.w * CAMERA_SCALE * 0.5f;
+    //    unsigned int scale_v_off = (float)src_rect.h * CAMERA_SCALE * 0.5f;
+    //
+    //    SDL_Rect dstrect = { CAMERA_X + x - scale_h_off,
+    //        CAMERA_Y - y - scale_v_off,
+    //        (float)src_rect.w * CAMERA_SCALE, (float)src_rect.h * CAMERA_SCALE };
+    //
+    //    Engine::drawTexture(texture, src_rect, dstrect);
+    //
+    //}
 
     static SDL_Color colors[] = {
         {0x00, 0x00, 0x00, 0xFF},
@@ -299,7 +325,7 @@ namespace Engine {
     //    frame_w(frame_w), frame_h(frame_h),
     //    current_frame(0), current_time(0) { }
     //
-    void Sprite::draw(float x, float y, uint8_t cur_frame, uint8_t cur_anim) {
+    void Sprite::draw(float x, float y, double angle, uint8_t cur_frame, uint8_t cur_anim) {
         Animation& anim = animations[cur_anim];
 
         SDL_Rect srcrect = { anim.frame_x + cur_frame * w, 
@@ -313,7 +339,7 @@ namespace Engine {
             CAMERA_Y - y - scale_v_off,
             (float)w * CAMERA_SCALE, (float)h * CAMERA_SCALE };
 
-        Engine::drawTexture(sprite_sheet, srcrect, dstrect);
+        Engine::drawTexture(sprite_sheet, srcrect, dstrect, angle);
     }
 
 }

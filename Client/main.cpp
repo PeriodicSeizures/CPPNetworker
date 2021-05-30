@@ -5,7 +5,6 @@
 #include <string>
 #include "task/Task.h"
 #include "engine/Engine.h"
-#include "entity/Entity.h"
 
 int main(void)
 {
@@ -15,9 +14,15 @@ int main(void)
 	//MAIN_MENU_TASK.focus();
 	WORLD_TASK.focus();
 
-	bool alive = true;
+	//std::chrono::
+
+	//bool alive = true;
 	bool render = true;
-	while (alive) {
+	unsigned int last_update = SDL_GetTicks();
+	while (Task::GAME_ALIVE) {
+
+		unsigned int current = SDL_GetTicks();
+		float delta = (current - last_update) / 1000.f;
 
 		// event polling thousands of times per second is
 		// unnecessary and drastically increases cpu usage
@@ -30,7 +35,7 @@ int main(void)
 			switch (e.type)
 			{
 			case SDL_QUIT:
-				alive = false;
+				Task::GAME_ALIVE = false;
 				break;
 			case SDL_WINDOWEVENT:
 				switch (e.window.event) {
@@ -53,6 +58,8 @@ int main(void)
 			
 		}
 
+		Task::current_task->on_update(delta);
+
 		// only render on mouse focus
 		if (render) {
 			Engine::fill({0, 0, 0, 255});
@@ -62,6 +69,9 @@ int main(void)
 
 			Engine::doRender();
 		}
+
+		last_update = current;
+
 	}
 
 	Task::uninit();

@@ -2,7 +2,7 @@
 
 MainMenuTask MAIN_MENU_TASK;
 
-static bool do_stops = false;
+
 
 MainMenuTask::MainMenuTask() {
 
@@ -14,14 +14,14 @@ MainMenuTask::MainMenuTask() {
 
 			std::cout << "connect callback() to ip: " << ip << ", port: " << port << "\n";
 
-			if (do_stops) {
+			if (Task::do_stops) {
 				Task::_io_context.stop();
 			}
 
 			Task::connection->connect_to_server(Task::_io_context, ip, port);
 
 			Task::cv_run.notify_one();
-			do_stops = true;
+			Task::do_stops = true;
 		}
 	);
 
@@ -67,7 +67,7 @@ void MainMenuTask::on_render() {
 	}
 }
 
-void MainMenuTask::on_tick() {
+void MainMenuTask::on_update(float delta) {
 
 }
 

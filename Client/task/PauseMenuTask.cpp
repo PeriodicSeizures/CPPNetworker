@@ -10,7 +10,7 @@ void PauseMenuTask::on_render() {
 
 }
 
-void PauseMenuTask::on_tick() {
+void PauseMenuTask::on_update(float delta) {
 
 }
 

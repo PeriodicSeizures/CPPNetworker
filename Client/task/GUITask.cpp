@@ -16,7 +16,7 @@ void GUITask::on_render() {
 	}
 }
 
-void GUITask::on_tick() {
+void GUITask::on_update(float delta) {
 
 }
 

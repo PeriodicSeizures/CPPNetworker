@@ -13,10 +13,13 @@ std::thread Task::run_thread;
 std::condition_variable Task::cv_run;
 std::mutex Task::mux_run;
 bool Task::running = true;
+bool Task::do_stops = false;
 
 Player* Task::player; // (400, -300);
+Engine::Sprite* Task::brick_sprite;
 
 bool Task::DEBUG;
+bool Task::GAME_ALIVE = true;
 
 void Task::focus() {
 	prev_task = current_task;
@@ -43,11 +46,15 @@ void Task::init() {
 
 	//player = new Player(400, -300);
 	player = new Player(400, -300);
+	brick_sprite = new Engine::Sprite("resources/brick.json");
 }
 
 void Task::uninit() {
 	// connection is a smart ptr, no need to free it
 	Task::running = false;
-	Task::_io_context.stop();
+	Task::cv_run.notify_one();
+	if (Task::do_stops) {
+		Task::_io_context.stop();
+	}
 	Task::run_thread.join();
 }

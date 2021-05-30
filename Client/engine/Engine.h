@@ -12,7 +12,12 @@ namespace Engine {
 
 	void doRender();
 
-	void drawTexture(SDL_Texture *texture, SDL_Rect& src_rect, SDL_Rect& rect);
+	void drawTexture(SDL_Texture* texture,
+		SDL_Rect& src_rect, SDL_Rect& rect);
+
+	void drawTexture(SDL_Texture *texture, 
+		SDL_Rect& src_rect, SDL_Rect& rect,
+		double angle);
 
 	void drawFormattedString(const std::string& str, 
 		int x, int y, 
@@ -48,7 +53,7 @@ namespace Engine {
 	public:
 		Sprite(std::string filename);
 
-		void draw(float x, float y, uint8_t cur_frame, uint8_t cur_anim);
+		void draw(float x, float y, double angle, uint8_t cur_frame, uint8_t cur_anim);
 
 	};
 

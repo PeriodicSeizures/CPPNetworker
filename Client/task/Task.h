@@ -11,7 +11,7 @@ class Task {
 
 public:
 	virtual void on_render() = 0;
-	virtual void on_tick() = 0;
+	virtual void on_update(float delta) = 0;
 	virtual void on_event(SDL_Event &e) = 0;
 
 	/*
@@ -25,18 +25,21 @@ public:
 	static std::thread run_thread;
 	static std::condition_variable cv_run;
 	static std::mutex mux_run;
-	static bool running;
+	static bool running; // for asio
+	static bool do_stops;
 
 	/*
 	* in game variables
 	*/
 
 	static Player *player;
+	static Engine::Sprite* brick_sprite;
 
 	/*
 	* Settings
 	*/
 	static bool DEBUG;
+	static bool GAME_ALIVE;
 
 	static void init();
 	static void uninit();
@@ -48,9 +51,10 @@ class WorldTask : public Task {
 public:
 	WorldTask();
 	void on_render() override;
-	void on_tick() override;
+	void on_update(float delta) override;
 	void on_event(SDL_Event& e) override;
 
+	//Engine::Sprite *brick_sprite;
 };
 
 /*
@@ -67,7 +71,7 @@ public:
 	std::vector<GUIElement*> elements;
 
 	virtual void on_render() override;
-	virtual void on_tick() override;
+	void on_update(float delta) override;
 	virtual void on_event(SDL_Event& e) override;
 };
 
@@ -76,7 +80,7 @@ public:
 	MainMenuTask();
 
 	void on_render() override;
-	void on_tick() override;
+	void on_update(float delta) override;
 	void on_event(SDL_Event& e) override;
 };
 
@@ -85,7 +89,7 @@ public:
 	PauseMenuTask();
 
 	void on_render() override;
-	void on_tick() override;
+	void on_update(float delta) override;
 	void on_event(SDL_Event& e) override;
 };
 
@@ -94,7 +98,7 @@ public:
 	CommandTask();
 
 	void on_render() override;
-	void on_tick() override;
+	void on_update(float delta) override;
 	void on_event(SDL_Event& e) override;
 
 };

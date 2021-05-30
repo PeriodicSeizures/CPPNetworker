@@ -10,7 +10,7 @@ void CommandTask::on_render() {
 	//input.on_render();
 }
 
-void CommandTask::on_tick() {
+void CommandTask::on_update(float delta) {
 
 }
 
