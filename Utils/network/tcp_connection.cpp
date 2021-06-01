@@ -25,8 +25,10 @@ tcp::socket& TCPConnection::socket() {
 
 void TCPConnection::start() {
 	read_header();
-	auto self(shared_from_this());
-	asio::post([this, self]() {write_header(); });
+	//auto self(shared_from_this());
+	//asio::post([this, self]() {
+	//	write_header(); 
+	//});
 }
 
 bool TCPConnection::is_connected() {
@@ -42,6 +44,13 @@ void TCPConnection::connect_to_server(asio::io_context& _io_context, std::string
 
 	asio::async_connect(_socket, endpoints,
 		std::bind(&TCPConnection::start, this));
+}
+
+void TCPConnection::forward(Packet packet) {
+	bool was_empty = out_packets.empty();
+	out_packets.push_back(std::move(packet));
+	if (was_empty)
+		write_header();
 }
 
 //void TCPConnection::dispatch(Packet packet) {
@@ -117,11 +126,16 @@ void TCPConnection::read_body() {
 
 void TCPConnection::write_header() {
 
-	// will always check whether the container is empty
-	bool was_notified = out_packets.wait();
+	/*
+	* Behaviour of AsyncQueue::wait():
+	*  - present data will end
+	*/
+	//bool was_notified = out_packets.wait();
+	//if (was_notified)
+	//	return;
 
-	if (was_notified)
-		return;
+	//if (out_packets.count() <= 1)
+	//	return;
 
 	std::cout << "write_header()\n";
 
@@ -146,8 +160,10 @@ void TCPConnection::write_header() {
 void TCPConnection::write_body() {
 	// if the packet should contain data to write, then write
 
-	uint16_t len = 0;
-	Packet::ErrorCode p_e = Packet::S(out_packets.front().type, len);
+	//uint16_t len = 0;
+	//Packet::ErrorCode p_e = Packet::S(out_packets.front().type, len);
+
+	uint16_t len = Packet::sizes[(uint16_t)out_packets.front().type];
 	
 	if (len > 0) {
 		std::cout << "w1, " << len << "\n";
@@ -159,7 +175,9 @@ void TCPConnection::write_body() {
 			if (!e) {
 				out_packets.pop_front();
 				std::cout << "sent something with a body\n";
-				write_header();
+
+				if (!out_packets.empty())
+					write_header();
 			}
 			else {
 				std::cout << "write body error: " << e.message() << "\n";

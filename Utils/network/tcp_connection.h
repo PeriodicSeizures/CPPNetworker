@@ -21,8 +21,9 @@ private:
 	tcp::socket _socket;
 	//Packet::Type in_packet_type;
 
-public:
 	AsyncQueue<Packet> out_packets;
+
+public:
 	AsyncQueue<Packet> in_packets;
 
 	UUID uuid;
@@ -59,16 +60,22 @@ public:
 
 	template<class T>
 	void dispatch(T packet) {
+		//static_assert()
 		auto size = sizeof(T); // Packet::sizes[(uint16_t)packet.type];
 		if (size) {
 			Packet __packet = { packet.type, new char[size] };
 			std::memcpy(__packet.data, (void*)&packet, size);
-			out_packets.push_back(std::move(__packet));
+			forward(std::move(__packet));
+
+			//out_packets.push_back(std::move(__packet));
 		}
 		else {
-			out_packets.push_back({ packet.type });
+			//out_packets.push_back({ packet.type });
+			forward({ packet.type });
 		}
 	}
+
+	void forward(Packet packet);
 
 	// send raw packet
 	//void dispatch(Packet packet);

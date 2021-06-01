@@ -3,7 +3,7 @@
 WorldTask WORLD_TASK;
 
 WorldTask::WorldTask() {
-	other = new Player(0, 0);
+	
 }
 
 void WorldTask::on_render() {

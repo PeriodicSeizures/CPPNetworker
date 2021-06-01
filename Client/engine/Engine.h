@@ -38,7 +38,7 @@ namespace Engine {
 
 	struct Animation {
 
-		const uint16_t frame_x, frame_y; // topleft begin
+		uint16_t frame_x, frame_y; // topleft begin
 		std::vector<uint16_t> durations; // constlike
 
 	};

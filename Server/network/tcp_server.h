@@ -29,25 +29,25 @@ public:
 	void tick();
 
 	/*
-	* to send a constructed struct
+	* to send an assembled struct (not 'Packet' struct)
 	*/
 	template<class T>
 	void dispatch(T packet) {
 		for (auto&& conn : connections) {
-			conn.second->dispatch(packet);
+			conn.second->dispatch(std::move(packet));
 		}
 	}
 
 	template<class T>
 	void dispatch(T packet, UUID uuid) {
-		connections[uuid]->dispatch(packet);
+		connections[uuid]->dispatch(std::move(packet));
 	}
 
 	template<class T>
 	void dispatch_except(T packet, UUID uuid) {
 		for (auto&& conn : connections) {
 			if (conn.first != uuid)
-				conn.second->dispatch(packet);
+				conn.second->dispatch(std::move(packet));
 		}
 	}
 

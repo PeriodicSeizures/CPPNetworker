@@ -11,6 +11,8 @@ void Entity::on_render() {
 
 	Engine::Animation& anim = sprite.animations[cur_anim];
 
+	//anim.
+	
 	if (t >= anim.durations[cur_frame] && do_animate) {
 		(++cur_frame) %= anim.durations.size() - 1;
 		cur_time = ticks;

@@ -33,6 +33,7 @@ public:
 	*/
 
 	static Player *player;
+	static Player *other; // = new Player(400, -300);
 	static Engine::Sprite* brick_sprite;
 
 	/*
@@ -56,7 +57,7 @@ public:
 
 	void do_listen();
 
-	Player* other;
+	//Player* other;
 
 	//Engine::Sprite *brick_sprite;
 };

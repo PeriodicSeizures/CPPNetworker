@@ -16,6 +16,7 @@ bool Task::running = true;
 bool Task::do_stops = false;
 
 Player* Task::player; // (400, -300);
+Player* Task::other; // (400, -300);
 Engine::Sprite* Task::brick_sprite;
 
 bool Task::DEBUG;
@@ -46,6 +47,7 @@ void Task::init() {
 
 	//player = new Player(400, -300);
 	player = new Player(400, -300);
+	other = new Player(400, -300);
 	brick_sprite = new Engine::Sprite("resources/brick.json");
 }
 

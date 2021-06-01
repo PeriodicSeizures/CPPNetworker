@@ -36,7 +36,7 @@ void TCPServer::tick() {
 			* it is safe to remove every packet, except for the newest one
 			* the newest packet might be unfinished
 			*/
-		if (!it->second->is_connected()) {
+		if (!it->second || !it->second->is_connected()) {
 			it = connections.erase(it);
 			continue;
 		}
@@ -54,7 +54,8 @@ void TCPServer::tick() {
 
 			switch (e.type) {
 			case Packet::Type::SRC_CLIENT_TRUSTED_MOTION: {
-				this->dispatch_except(e, conn->uuid);
+				// actually forward to all except the sender
+				this->forward_except(e, conn->uuid);
 				break;
 			}
 			case Packet::Type::CHAT32: {
@@ -83,21 +84,26 @@ void TCPServer::tick() {
 	}
 }
 
+//inline void __forward(std::shared_ptr<TCPConnection> conn, Packet packet) {
+//	conn->forward(packet);
+//}
 
 void TCPServer::forward(Packet packet) {
 	for (auto&& conn : connections) {
-		conn.second->out_packets.push_back(std::move(packet));
+		conn.second->forward(std::move(packet));
 	}
 }
 
 void TCPServer::forward(Packet packet, UUID uuid) {
-	connections[uuid]->out_packets.push_back(std::move(packet));
+	connections[uuid]->forward(std::move(packet));
 }
 
 void TCPServer::forward_except(Packet packet, UUID uuid) {
 	for (auto&& conn : connections) {
-		if (conn.first != uuid)
-			conn.second->out_packets.push_back(std::move(packet));
+		if (conn.first != uuid) {
+			//conn.second->out_packets.push_back(std::move(packet));
+			conn.second->forward(std::move(packet));
+		}
 	}
 }
 
